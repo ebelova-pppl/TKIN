@@ -1,0 +1,18 @@
+
+# hybm_mpi.x
+
+ salloc --nodes 1 --qos interactive --time 03:59:00 --constraint cpu
+ cd $SCRATCH/nstx24
+ srun -n 96 -c 2 --cpu_bind=cores ./hybm_mpi.x
+
+#srun -n 64 -c 4 --cpu_bind=cores ./hybm_mpi.x
+
+
+
+# tkin_read
+ salloc --nodes 1 --qos interactive --time 00:10:00 --constraint cpu
+ cd $SCRATCH/nstx24
+
+ srun -n 16 -c 16 --cpu_bind=cores ./tkin_mpi.x
+
+ srun -n 16 -c 16 --cpu_bind=cores ./tkin_read_mpi.x

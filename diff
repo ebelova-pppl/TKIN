@@ -1,0 +1,137 @@
+2012,2013c2012
+< c         if( x>0. & abs(q(i)) < 29.5) then
+<           if( x>0.) then
+---
+>           if( x>0. & abs(q(i)) < 29.5) then
+2016c2015
+< c           srhob1(i,j,k)= (1-ni0)*srhob1(i,j,k)
+---
+>             srhob1(i,j,k)= (1-ni0)*srhob1(i,j,k)
+2052c2051
+<         MPI_print 'I_i_phi/I_phi= ', rii(3)/(rib(3)+rii(3))
+---
+> c       MPI_print 'I_i_phi/I_phi= ', rii(3)/(rib(3)+rii(3))
+2059c2058
+<         MPI_print 'J_i_max/J_b_max(z,r,phi)= ', rii/rib
+---
+> c       MPI_print 'J_i_max/J_b_max(z,r,phi)= ', rii/rib
+2094,2098c2093,2097
+<       MPI_print ' '
+<       MPI_print 'R0=',r0,'   alphah1=',alphah1,'   alphah2=',alphah2,'   psi0=',psi0
+<       MPI_print 'q0=',qq0, '    <beta>=',beta_av
+< c     MPI_print '<p>=',psum/vsum, '   beta_t=',2*psum/vsum,'   <B^2>=',bsum/vsum
+<       MPI_print ' '
+---
+> c     MPI_print ' '
+> c     MPI_print 'R0=',r0,'   alphah1=',alphah1,'   alphah2=',alphah2,'   psi0=',psi0
+> c     MPI_print 'q0=',qq0, '    <beta>=',beta_av
+> cc    MPI_print '<p>=',psum/vsum, '   beta_t=',2*psum/vsum,'   <B^2>=',bsum/vsum
+> c     MPI_print ' '
+2113,2115c2112,2114
+<       MPI_print ' '
+<       MPI_print 'Rs=',rsep,' Zs=',zsep
+<       MPI_print ' '
+---
+> c     MPI_print ' '
+> c     MPI_print 'Rs=',rsep,' Zs=',zsep
+> c     MPI_print ' '
+2119,2136c2118,2135
+<       open(unit=15,file='psi.dat')
+<       write(15,*) 'equilibrium'
+<       write(15,9) nid, (njm2-j3+1)
+<       write(15,10) (q(i),i=3,nim2),(r(j),j=j3,njm2)
+<       write(15,10) ((spsi(i,j,k3),i=3,nim2),j=j3,njm2)
+<       write(15,10) ((sp(i,j,k3),i=3,nim2),j=j3,njm2)
+< 
+<       write(15,10) ((v1b1(i,j,k3),i=3,nim2),j=j3,njm2)
+<       write(15,10) ((v2b1(i,j,k3),i=3,nim2),j=j3,njm2)
+<       write(15,10) ((v3b1(i,j,k3),i=3,nim2),j=j3,njm2)
+< 
+<       write(15,10) ( (srhoq0(i,j,k3),i=3,nim2),j=j3,njm2)
+<       write(15,10) ((v3curi0(i,j,k3),i=3,nim2),j=j3,njm2)
+<       write(15,10) ( (srhob1(i,j,k3),i=3,nim2),j=j3,njm2)
+< 
+<       write(15,10) ((v1cur(i,j,k3),i=3,nim2),j=j3,njm2)
+<       write(15,10) ((v2cur(i,j,k3),i=3,nim2),j=j3,njm2)
+<       write(15,10) ((v3cur(i,j,k3),i=3,nim2),j=j3,njm2)
+---
+> c     open(unit=15,file='psi.dat')
+> c     write(15,*) 'equilibrium'
+> c     write(15,9) nid, (njm2-j3+1)
+> c     write(15,10) (q(i),i=3,nim2),(r(j),j=j3,njm2)
+> c     write(15,10) ((spsi(i,j,k3),i=3,nim2),j=j3,njm2)
+> c     write(15,10) ((sp(i,j,k3),i=3,nim2),j=j3,njm2)
+> 
+> c     write(15,10) ((v1b1(i,j,k3),i=3,nim2),j=j3,njm2)
+> c     write(15,10) ((v2b1(i,j,k3),i=3,nim2),j=j3,njm2)
+> c     write(15,10) ((v3b1(i,j,k3),i=3,nim2),j=j3,njm2)
+> 
+> c     write(15,10) ( (srhoq0(i,j,k3),i=3,nim2),j=j3,njm2)
+> c     write(15,10) ((v3curi0(i,j,k3),i=3,nim2),j=j3,njm2)
+> c     write(15,10) ( (srhob1(i,j,k3),i=3,nim2),j=j3,njm2)
+> 
+> c     write(15,10) ((v1cur(i,j,k3),i=3,nim2),j=j3,njm2)
+> c     write(15,10) ((v2cur(i,j,k3),i=3,nim2),j=j3,njm2)
+> c     write(15,10) ((v3cur(i,j,k3),i=3,nim2),j=j3,njm2)
+2140c2139
+<       close(15)
+---
+> c     close(15)
+2142,2149c2141,2148
+<       open(unit=16,file='ji.dat')
+<       write(16,9) nid, (njm2-j3+1)
+<       write(16,10) ( (srhoq0(i,j,k3),i=3,nim2),j=j3,njm2)
+<       write(16,10) ((v1curi0(i,j,k3),i=3,nim2),j=j3,njm2)
+<       write(16,10) ((v2curi0(i,j,k3),i=3,nim2),j=j3,njm2)
+<       write(16,10) ((v3curi0(i,j,k3),i=3,nim2),j=j3,njm2)
+<       write(16,10) ((sg(i,j,k3),i=3,nim2),j=j3,njm2)
+<       close(16)
+---
+> c     open(unit=16,file='ji.dat')
+> c     write(16,9) nid, (njm2-j3+1)
+> c     write(16,10) ( (srhoq0(i,j,k3),i=3,nim2),j=j3,njm2)
+> c     write(16,10) ((v1curi0(i,j,k3),i=3,nim2),j=j3,njm2)
+> c     write(16,10) ((v2curi0(i,j,k3),i=3,nim2),j=j3,njm2)
+> c     write(16,10) ((v3curi0(i,j,k3),i=3,nim2),j=j3,njm2)
+> c     write(16,10) ((sg(i,j,k3),i=3,nim2),j=j3,njm2)
+> c     close(16)
+2201c2200
+<       hi0= bt*22.6                          # TMP for shot 141711_470.
+---
+>       hi0= bt*21.2                          # TMP for shot 141711_470.
+2421c2420
+<         MPI_print '# of iterations=', l, '    err=',err
+---
+> c       MPI_print '# of iterations=', l, '    err=',err
+2427c2426
+<         MPI_print '**** q0=',qq0
+---
+> c       MPI_print '**** q0=',qq0
+2432,2433c2431,2432
+<         MPI_print '*** err1=', err1
+<         MPI_print ''
+---
+> c       MPI_print '*** err1=', err1
+> c       MPI_print ''
+2587,2588c2586,2587
+<       f2(x)=  x**5
+<       fp2(x)= 5*x**4
+---
+>       f2(x)=  3*x**2  - 2*x**3
+>       fp2(x)= 6*x**1  - 6*x**2
+2706c2705
+<       betav= 3.0
+---
+>       betav= 3
+2885,2887c2884,2886
+<       MPI_print '==============================='
+<       MPI_print '# of interations in j_i=', l, '    err=',err
+<       MPI_print '==============================='
+---
+> c     MPI_print '==============================='
+> c     MPI_print '# of interations in j_i=', l, '    err=',err
+> c     MPI_print '==============================='
+3289c3288
+<       rax= 23.
+---
+>       rax= 12.7

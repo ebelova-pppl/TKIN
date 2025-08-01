@@ -1,0 +1,193 @@
+; idl code to read and plot 2D flux surfaces from TRANSP
+
+; define arrays to read.
+
+xx=fltarr(20)
+xbi=fltarr(20)
+psii=fltarr(20)
+de=fltarr(20)
+db=fltarr(20)
+jt=fltarr(20)
+jb=fltarr(20)
+gi=fltarr(20)
+qi=fltarr(20)
+ppl=fltarr(20)
+
+rc0=fltarr(20)
+rc1=fltarr(20)
+rc2=fltarr(20)
+rc3=fltarr(20)
+
+rs1=fltarr(20)
+rs2=fltarr(20)
+rs3=fltarr(20)
+
+yc0=fltarr(20)
+yc1=fltarr(20)
+yc2=fltarr(20)
+yc3=fltarr(20)
+
+ys1=fltarr(20)
+ys2=fltarr(20)
+ys3=fltarr(20)
+
+string=''
+;--------------------------------------
+; Read data from profiles.dat
+file='profiles.dat'
+openr,1,file
+readf,1,string
+readf,1,string
+readf,1,string
+readf,1,xx
+readf,1,string
+readf,1,xbi
+readf,1,string
+readf,1,psii
+readf,1,string
+readf,1,de
+readf,1,string
+readf,1,db
+readf,1,string
+readf,1,jt
+readf,1,string
+readf,1,jb
+readf,1,string
+readf,1,gi
+readf,1,string
+readf,1,qi
+readf,1,string
+readf,1,ppl
+
+readf,1,string
+readf,1,string
+readf,1,string
+readf,1,rc0
+readf,1,string
+readf,1,rc1
+readf,1,string
+readf,1,rc2
+readf,1,string
+readf,1,rc3
+readf,1,string
+readf,1,rs1
+readf,1,string
+readf,1,rs2
+readf,1,string
+readf,1,rs3
+readf,1,string
+readf,1,string
+readf,1,yc0
+readf,1,string
+readf,1,yc1
+readf,1,string
+readf,1,yc2
+readf,1,string
+readf,1,yc3
+readf,1,string
+readf,1,ys1
+readf,1,string
+readf,1,ys2
+readf,1,string
+readf,1,ys3
+close,1
+;----------------------------------------
+
+nt=50
+theta=indgen(nt)*2*!PI/(nt-1.)
+r2=fltarr(20,nt)
+z2=fltarr(20,nt)
+
+;TMP force the symmetry
+ rs1(19)=0.
+ rs2(19)=0.
+ rs3(19)=0.
+ yc0(19)=0.
+ yc1(19)=0.
+ yc2(19)=0.
+ yc3(19)=0.
+
+for i=0,19 do $
+  r2(i,*)= rc0(i) +rc1(i)*cos(  theta) +rs1(i)*sin(  theta) $
+                  +rc2(i)*cos(2*theta) +rs2(i)*sin(2*theta) $
+                  +rc3(i)*cos(3*theta) +rs3(i)*sin(3*theta)
+for i=0,19 do $
+  z2(i,*)= yc0(i) +yc1(i)*cos(  theta) +ys1(i)*sin(  theta) $
+                  +yc2(i)*cos(2*theta) +ys2(i)*sin(2*theta) $
+                  +yc3(i)*cos(3*theta) +ys3(i)*sin(3*theta)
+
+i=19     
+rr=rc0(i) +rc1(i)*cos(theta) +rs1(i)*sin(theta)
+zz=yc0(i) +yc1(i)*cos(theta) +ys1(i)*sin(theta)
+
+rr=rr +rc2(i)*cos(2*theta) +rs2(i)*sin(2*theta)
+zz=zz +yc2(i)*cos(2*theta) +ys2(i)*sin(2*theta)
+
+rr=rr +rc3(i)*cos(3*theta) +rs3(i)*sin(3*theta)
+zz=zz +yc3(i)*cos(3*theta) +ys3(i)*sin(3*theta)
+
+
+ 
+plot,r2(19,*),z2(19,*),xra=[0,155.],yra=[-150.,150.],/xsty,/ysty
+for i=0,18 do oplot,r2(i,*),z2(i,*)
+
+print,'================================================='
+print,'M.axis at R=',total(r2(0,*))/nt,'cm  Z=',total(z2(0,*))/nt,'cm'
+print,''
+print,'Plasma edge at R=',max(r2(19,*))
+print,'        and at R=',min(r2(19,*))
+print,'               Z=',max(z2(19,*)), ' ',min(z2(19,*))
+print,'================================================='
+
+
+; Save last flux surface data for FREE_FIX code in "edge_new.dat"
+
+file='edge_new.dat'
+openw,1,file
+for i=0,nt-1 do printf,1,rr(i),zz(i)
+close,1
+
+;========================================================
+; Read dpsi data from gui1.pro (from psi.dat)
+; to compare with transp.
+
+file='fig_psi.dat'
+openr,1,file
+readf,1,ni,nj
+z1=fltarr(ni)
+r1=fltarr(nj)
+psi1=fltarr(ni,nj)
+readf,1,z1,r1
+readf,1,psi1
+close,1
+
+contour,psi1,z1,r1,levels=[min(psi1)*.01],/xstyle,/ystyle $
+        ,xrange=[0,max(z1)],yrange=[min(r1),max(r1)],/isotropic
+lambda_i= 4.82; shot 141711 t=0.470 TMP
+za=z2(19,*)/lambda_i
+ra=r2(19,*)/lambda_i
+plot,za,ra,xrange=[0,max(z1)],yrange=[min(r1),max(r1)],/xsty,/ysty,/iso,/noerase,lines=2
+
+
+
+ l_i= lambda_i/100.
+
+ thisdevice=!d.name
+ set_plot,'PS'
+ device,filename='psi_fit.ps',ysize=5,/inches,yoffset=2,/color
+
+ loadct,0
+ !p.charsize=1.0
+
+ contour,psi1,z1*l_i,r1*l_i,levels=[min(psi1)*.01],/xstyle,/ystyle $
+         ,xtit='Z(m)',ytit='R(m)' $
+         ,xrange=[0,max(z1)]*l_i,yrange=[min(r1),max(r1)]*l_i,/isotropic
+ plot,za*l_i,ra*l_i,xrange=[0,max(z1)]*l_i $
+         ,yrange=[min(r1),max(r1)]*l_i,/xsty,/ysty,/iso,/noerase,lines=2
+
+ device,/close_file
+ set_plot,thisdevice
+
+
+
+

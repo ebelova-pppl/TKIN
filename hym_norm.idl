@@ -1,0 +1,108 @@
+; Calculate all plasma parameters in HYM units
+
+; Input
+;==================================================
+ bzr= 0.465      ; Bz*R [Tm]
+ r0 = 1.023      ; R0   [m]
+
+ de = 4.433e13   ; n_e [cm^-3]
+ db = 0.3435e13  ; n_b [cm^-3]  
+
+ zeff = 1.2
+ q0   = 1.188
+ q95  = 17.7
+ bpl  = 0.102  ; beta_pl
+ bbm  = 0.075
+
+ jpl  = 112.4-18.85  ; Jpl [A/cm^2]
+ jb   = 18.85        ; Jb  [A/cm^2]
+ itot = 610          ; I   [kA] - not known!!
+
+ ppl  = 1.770e4 ; P_pl [Pa]
+ ti   = 1.40e3  ; Ti   [eV]
+ te   = 1.40e3  ; Te   [eV]
+
+ ompl = 2.40e5  ; Om_p [rad/s]
+ omb  = 8.8e5   ; Om_b [rad/s]
+
+ dpsi = 1.15e-1 ; delta_psi [Wb/rad]
+
+; beam param
+ zdm  = 1/2.    ; Z/mu
+ mu   = 2.      ; D
+ e0   = 90e3    ; E_b [eV]  "NSTX 141711 t=0.47"
+
+;Geometry (cm)
+rc=155
+ri=17
+zc=150
+
+rs=152.1  ; from read_profiles_idl
+rsi=18.6
+zs=125.6
+;===================================================
+
+; Units
+rpi= 3.14159
+
+b0t = bzr/r0                     ; B0 [T]
+b0g = b0t*10^4                   ; B0 [G]
+omci= 9.58e3*zdm*b0g             ; omage_ci [rad/s]
+fci = omci/(2*rpi)               ; f_ci [Hz]
+lu  = 2.27e7/(zdm*sqrt(mu*de))   ; lambda_i [cm]
+va  = 2.18e11*b0g/sqrt(mu*de)    ; V_a [cm/s]
+v0  = 9.79e5*sqrt(2*e0/mu)       ; V0  [cm/s]
+
+pu  = 2*3.98e5*(b0t)^2           ; B0^2/(4*pi) [Pa]
+psiu= b0t*lu^2*1e-4              ; [Wb]
+ju  = b0t/(lu*0.01*1.26e-6)      ; [A/m^2]
+ju  = ju*1e-4                    ; [A/cm^2]
+iu  = ju*lu^2/1000.              ; [kA]
+
+print,''
+print,'Code units'
+print,'B0      =',b0t,'[T]'
+print,'lambda_i=',lu,' [cm]'
+print,'f_ci    =',fci,' [Hz]', '       omci=',omci,'[rad/s]'
+print,'J units =',ju,' [A/cm^2]'
+print,'I units =',iu,' [kA]'
+print,'psi units =',psiu,'[Wb]'
+print,'p units =',pu,'[Pa]'
+;=======================================================
+
+; Normalize everything
+r0n= r0*100/lu
+
+print,''
+print,'Input for hmin.i'
+print,'Rc=',rc/lu
+print,'Zc=',zc/lu
+print,'Ri=',ri/lu
+;print,''
+print,'nb=',db/de
+print,'V0=',v0/va
+print,'VA=',va,'[cm/s]'
+
+print,''
+print,'Input for tk.i'
+print,'psi0=',-dpsi/psiu
+print,'Itot=',itot/iu
+print,'p0  =',ppl/pu
+print,'q0  =',q0
+
+print,''
+print,'Other equilibrium parameters'
+print,'R0=',r0n,' Rs=',rs/lu,rsi/lu,'  Zs=',zs/lu
+print,'Omega_pl=',ompl/omci
+print,'Omega_b =',omb/omci
+
+print,'J_pl=',jpl/ju
+print,'J_b =',jb/ju, '        J_tot=',jpl/ju+jb/ju
+print,'V_phi_b=',r0n*omb/omci
+
+print,'check: nb*R0*Om_b*(1-1/zeff)=',db/de*r0n*omb/omci*(1-1./zeff)
+print,'(1-1/zeff)=',(1-1./zeff)
+print,'==============='
+
+print,'check: pressure=n*(Te+Ti)=',de*(ti+te)*1.6e-12*0.1,'[Pa]'
+print,'                      ppl=',ppl

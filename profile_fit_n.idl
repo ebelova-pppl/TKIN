@@ -1,0 +1,103 @@
+; Run 'read_profiles.idl' code first to get  all data.
+; Need xx,xbi,psii,gi,qi,de,db,jt,jb,ppl arrays
+
+  ;psi(xb)  psii
+  ;G(xb)    gi
+  ;q(xb)    qi
+  ;ne(x)    de
+  ;nb(x)    db
+  ;J_tot(x) jt
+  ;J_b(x)   jb
+  ;P(x)     ppl
+
+; Extended arrays
+psi=fltarr(21)
+xb=fltarr(21)
+g=fltarr(21)
+q=fltarr(21)
+
+psi(0)=0.
+psi(1:20)=psii
+psi= psi/max(psi)
+xpsi=1-psi
+xb(0)=0.
+xb(1:20)=xbi
+g(0)=gi(0)
+g(1:20)=gi
+q(0)=qi(0)
+q(1:20)=qi
+
+
+!p.multi=[0,2,2]
+!p.charsize=2.0
+loadCT,4
+
+;plot,xb,xpsi,title='xpsi=1-psi',xtitle='r'    ; Psi
+
+                                               ;Q-profile fit
+qf=16.5*exp(-(xpsi^0.60)/.30)*(1.-xpsi)^4+1.2
+plot,xb,q,title='q-profile'
+oplot,xb,qf,color=200
+;plot,xpsi,q,title='q-profile',xtitle='xpsi'
+;oplot,xpsi,qf,color=200
+
+                                                ; G-function fit.
+ gf2=5.*xpsi^4.0 - 4.0*xpsi^5                    ; needs to be scaled
+;gf2=sin(3.14/2*(xpsi/0.5)^1.5)*(1.5-xpsi)*xpsi^2*3.8
+gf2=max(g^2-1)*gf2
+;plot,xb,g^2-1,title='G^2-1',ysty=1
+;oplot,xb,gf2,color=200
+;oplot,xbi,gi^2-1,color=200
+ plot,xpsi,g^2-1,title='G^2-1',ysty=1,xtitle='xpsi'
+ oplot,xpsi,gf2,color=200
+
+                                                ;Pressure fit
+;pf=xpsi^2
+pf=0.5*(1+tanh((xpsi-0.73)/0.25))+xpsi^1.5/10
+pf=pf/(0.5*(1+tanh((0.27)/0.25))+0.1)
+ppf= (1.2)
+plot,xx,ppl/max(ppl),title='P_pl',xtitle='r',yra=[0,1.1]
+oplot,xb,pf,color=200
+
+                                                ; Plasma density
+def=exp(-1.5*(1-xpsi)^1.5) - exp(-1.5)
+def=def*.9/max(def)+0.1
+ plot,xx,de/max(de),title='N_e',xtitle='r',yra=[0,1.1],xra=[0,1.05]
+ oplot,xb,def,color=200
+                                                ; Beam density
+ dbf=xpsi^4                                     ; not needed
+;plot,xx,db/max(db),title='N_beam',ysty=1
+;oplot,xb,dbf,color=200
+
+;plot,xx,jt,title='J_tot_beam',ysty=1
+;oplot,xx,jb,color=200
+
+!p.multi=0
+
+;==========================================================
+; Save plots in ps file.
+thisdevice=!d.name
+set_plot,'PS'
+device,filename='profile_fit.ps',ysize=6,/inches,yoffset=2,/color
+
+!p.multi=[0,2,2]
+!p.charsize=1.
+loadCT,4
+
+plot,xb,q,title='q-profile'
+oplot,xb,qf,color=200
+
+plot,xb,g^2-1,title='G^2-1',ysty=1
+oplot,xb,gf2,color=200
+
+plot,xx,ppl/max(ppl),title='P_pl',xtitle='r',yra=[0,1.1]
+oplot,xb,pf,color=200
+
+plot,xx,de/max(de),title='N_e',yra=[0,1.1]
+oplot,xb,def,color=200
+
+device,/close_file
+set_plot,thisdevice
+
+!p.charsize=1.
+!p.multi=0

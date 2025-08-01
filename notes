@@ -1,0 +1,10 @@
+# new runs for NSTX 141711_470
+using hym_norm.idl, read_profiles.idl, and profile_fit_n.idl
+to get equil profiles from profiles.dat
+
+need to generate psi_bc.dat for tkin_read.p (using psi_bc_idl.pro and FREE_FIX) 
+psi_bc_141711.dat
+tkin_read.p output is in psi_141711.dat
+
+grids are 120x60x64, 71x71, np=1M
+ 
