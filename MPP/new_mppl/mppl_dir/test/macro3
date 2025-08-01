@@ -1,0 +1,30 @@
+#TESTCOMMAND: mppl --nolang --nonumeric
+
+define(Header,[ifelse(Module,foo,In foo,Not In foo)])
+
+      subroutine foo   # comment 1
+
+Module
+Header
+      real var
+      real(Size8) var
+
+      var = 1.0e23
+      var = 1.0_Size8
+      var = 1.0
+
+      end              # comment 2
+      subroutine bar
+
+Module
+Header
+        interface
+            subroutine foo(args)
+            integer :: args
+            end subroutine foo
+        end interface
+
+Module
+Header
+
+      end subroutine bar

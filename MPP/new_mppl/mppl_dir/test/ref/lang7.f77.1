@@ -1,0 +1,62 @@
+cTESTCOMMAND: mppl
+
+
+      subroutine foo1
+cProlog
+
+
+c$omp private(a1)
+c$omp private(none)
+
+
+      if (i .eq. 1) then
+
+c$omp private(a1)
+c$omp private(none)
+
+         j = i
+      endif
+
+c$omp parallel default(none) shared(k)
+c$omp single
+      k = 1
+c$omp end single
+c$omp end parallel
+
+      return
+      end
+
+c###################
+
+      subroutine foo2
+cProlog
+
+c$omp parallel default(none) shared(k)
+c$omp single
+      k = 1
+c$omp end single
+c$omp end parallel
+
+      return
+      end
+
+c###################
+
+      subroutine foo3
+cProlog
+
+c$omp parallel default(none) if(j .eq. 1)
+c$omp& shared (a1234567890, b1234567890, c1234567890, d1234567890, a12)
+c$omp& shared (n)
+
+c$omp& private (i)
+c$omp do schedule (dynamic)
+      do 23000 i = 1, n
+         call bar(i)
+23000 continue
+c$omp end do
+c$omp end parallel
+
+      return
+      end
+

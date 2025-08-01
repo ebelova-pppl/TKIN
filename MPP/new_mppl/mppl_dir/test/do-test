@@ -1,0 +1,270 @@
+#!/bin/csh -f
+#
+# DO-TEST - automatic test script for MAC
+#
+# To add a new test, the name must in the file 'test-list'.
+#
+# Additionally, test that start with 'numeric' are run several times with
+# different options to test the numeric conversion.
+#
+# Tests that start with 'lang' test language features.
+#
+
+#set Arch = `../../scripts/cfgman use`
+set Arch = 'check'
+
+set KeepRes = FALSE
+set GenRef = FALSE
+set Lvl      = 0
+
+set Base = `pwd`
+set Base = $Base:h
+#set Base = $Base:h
+#set Root = $Base/dev/$Arch
+#set BinD = $Root/bin
+#set Code = $BinD/mppl
+set Code = $Base/mppl
+
+set Tests    = ""
+
+while ($#argv > 0)
+  switch ($1)
+     case -c:
+          shift
+          set Code = $1
+          if (`expr $1 : '/.*'` == 0) then
+              set WrkDir = `pwd`/`dirname $1`
+              # cd there and back to resolve . and ..
+              pushd $WrkDir >& /dev/null
+              set WrkDir = `pwd`
+              popd >& /dev/null
+              set Code = $WrkDir/`basename $1`
+          else
+              set Code = $1
+          endif
+          breaksw
+     case -h:
+          echo "Usage: test [-c exec] [-h] [-r] [test]+"
+          echo "   -c  use code specified"
+          echo "   -h  this help message"
+          echo "   -k  keep results"
+          echo "   -r  generate the reference files"
+          exit(1)
+          breaksw
+     case -k:
+          set KeepRes = TRUE
+          breaksw
+     case -r:
+          set GenRef = TRUE
+          breaksw
+     default:
+          set Tests = ( $Tests $1 )
+          breaksw
+  endsw
+  shift
+end
+
+if (!(-x $Code)) then
+    echo "Can't find executable code $Code"
+    exit(1)
+else
+    echo "Testing $Code"
+endif
+
+if ("$Tests" == "") then
+   set Tests = `cat test-list`
+endif
+
+if (!(-d $Arch)) then
+    mkdir $Arch
+endif
+
+pushd $Arch >& /dev/null
+
+# copy files any path references are platform independent
+rm -f mppl mppl.sys mppl.std mppl.BASIS
+cp $Code mppl
+cp `dirname $Code`/mppl.{sys,std,BASIS} .
+#cp `dirname $Code`/mppl.{BASIS,SOL,EMU} `dirname $Code`/BASIS_VERSION .
+
+set Failed = ""
+
+foreach test ($Tests)
+    echo "  $test"
+
+    if (! -f ../$test) then
+        echo "    Missing test: $test"
+        set Failed = ($Failed $test)
+        continue
+    endif
+
+    set line1 = `head -1 ../$test`
+
+    if ($#line1 == 0) then
+        echo "    First line of test does not start with TESTCOMMAND: mppl"
+        set Failed = ($Failed $test)
+        continue
+     else if (`expr "$line1" : '#TESTCOMMAND: mppl.*'` == 0) then
+        echo "    First line of test does not start with TESTCOMMAND: mppl"
+        set Failed = ($Failed $test)
+        continue
+    endif
+
+    set CodeOpts = "$line1[3-]"
+
+    switch ($test)
+    case macro*
+
+        set NameList = ( )
+        set StatusList = ( )
+        set OutList = ( )
+
+        set status = 0
+
+        set res = $test
+
+#        echo "$res : mppl CodeOpts ../$test"
+        (./mppl $CodeOpts ../$test >! $res.1) >&! $res.2
+        set tstatus = $status
+
+        set NameList   = ( $NameList $res)
+        set StatusList = ( $StatusList $tstatus)
+        set OutList = ( $OutList $res.1 $res.2 )
+        breaksw
+
+    case numeric*
+
+        # This section runs each test several times with different options
+        # to test the real conversion
+
+        set n = `echo $test:t | sed 's/input//'`
+        set NameList = ( )
+        set StatusList = ( )
+        set OutList = ( )
+        foreach sys (LINUX UNICOS)
+            foreach r (4 8 16)
+
+                set status = 0
+
+                set res = $test.$sys$r
+
+#                echo "$res : mppl $CodeOpts -r$r -t$sys ../$test"
+                (./mppl $CodeOpts -r$r -t$sys ../$test >! $res.1) >&! $res.2
+                set tstatus = $status
+
+                set NameList   = ( $NameList $res)
+                set StatusList = ( $StatusList $tstatus)
+                set OutList = ( $OutList $res.1 $res.2 )
+
+            end
+        end   
+        breaksw
+
+    case lang*
+
+        set NameList = ( )
+        set StatusList = ( )
+        set OutList = ( )
+
+        foreach lang (f77 f90)
+
+            set status = 0
+
+            set res = $test.$lang
+
+#            echo "$res : mppl --lang$lang $CodeOpts ../$test"
+            (./mppl --lang$lang $CodeOpts ../$test >! $res.1) >&! $res.2
+            set tstatus = $status
+
+            set NameList   = ( $NameList $res )
+            set StatusList = ( $StatusList $tstatus )
+            set OutList = ( $OutList $res.1 $res.2 )
+        end
+
+         set status = 0
+
+         set res = $test.f90only
+         (./mppl --langf90 --nomacro --nonumeric --nopretty $CodeOpts ../$test >! $res.1) >&! $res.2
+         set NameList   = ( $NameList $res)
+         set StatusList = ( $StatusList $tstatus )
+         set OutList = ( $OutList $res.1 $res.2 )
+
+         set res2 = $test.f90new
+         (./mppl --isf90 $CodeOpts $res.1 >! $res2.1) >&! $res2.2
+         set NameList   = ( $NameList $res2)
+         set StatusList = ( $StatusList $tstatus )
+         set OutList = ( $OutList $res2.1 $res2.2 )
+
+        breaksw
+
+    default
+        echo "    Test has unexpeced prefix - $test"
+        set Failed = ($Failed $test)
+        continue
+
+    endsw
+
+    set compare = 1
+
+    foreach Name ($NameList)
+        set tstatus = $StatusList[1]
+        shift StatusList
+
+        foreach OutFile ($OutList[1-2])
+           set DiffFile = $OutFile.diff
+           rm -f $DiffFile
+        end
+
+        if ($tstatus != 0) then
+            echo "    $Name    (CRASHED)"
+            set compare = 0
+        else
+            foreach OutFile ($OutList[1-2])
+                set RefFile = ../ref/$OutFile
+                set DiffFile = $OutFile.diff
+                if ( -e $RefFile) then
+                    cmp -s $RefFile $OutFile
+                    if ( $status == 0) then
+                        if ($KeepRes == FALSE) then
+                            rm -f $OutFile
+                        endif
+                    else if ($GenRef == TRUE) then
+                        mv $OutFile $RefFile
+                        echo "    $OutFile    (ADDED)"
+                    else
+                        diff $RefFile $OutFile > $DiffFile
+                        echo "    $OutFile    (FAILED)"
+                        set compare = 0
+                    endif
+                else if (-e $OutFile ) then
+                    if ($GenRef == TRUE) then
+                        mv $OutFile $RefFile
+                        echo "    $OutFile    (ADDED)"
+                    else
+                        echo "    $OutFile    (NO REFERENCE FILE)"
+                        set compare = 0
+                    endif
+                endif
+            end
+        endif
+        shift OutList
+        shift OutList
+    end
+
+    if ($compare == 0) then
+        set Failed = ($Failed $test)
+    endif
+
+end
+
+echo ""
+if ("$Failed" == "") then
+   set Err = 0
+else
+   set Err = 1
+   echo "The following level $Lvl tests failed"
+   echo "   $Failed"
+endif
+echo ""
+
+exit($Err)

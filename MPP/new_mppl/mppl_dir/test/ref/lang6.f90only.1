@@ -1,0 +1,15 @@
+!TESTCOMMAND: mppl
+      subroutine foo
+
+      implicit real (a-h, o-z)
+      real dog
+      real(Size4) cat
+      double precision bird
+
+      dog = 1.567
+      cat = 345._Size4
+      bird = 433.43_Size8
+
+      return
+      end subroutine 
+

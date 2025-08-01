@@ -1,0 +1,61 @@
+#TESTCOMMAND: mppl
+
+define FOO BAR
+define BAZ none
+
+      subroutine foo1
+
+ifelse(FOO, BAR, [
+c$omp private(a1)
+c$omp private(BAZ)
+])
+
+      if (i .eq. 1) then
+ifelse(FOO, BAR, [
+c$omp private(a1)
+c$omp private(BAZ)
+])
+         j = i
+      endif
+
+c$omp parallel default(none) shared(k)
+c$omp single
+      k = 1
+c$omp end single
+c$omp end parallel
+
+      return
+      end
+
+####################
+
+      subroutine foo2
+
+c$omp parallel default(none) shared(k)
+c$omp single
+      k = 1
+c$omp end single
+c$omp end parallel
+
+      return
+      end
+
+####################
+
+      subroutine foo3
+
+c$omp parallel default(none) if (j .eq. 1)
+c$omp& shared (a1234567890, b1234567890, c1234567890, d1234567890, a12)
+c$omp& shared (n)
+
+c$omp& private (i)
+c$omp do schedule (dynamic)
+      do i = 1, n
+         call bar(i)
+      enddo
+c$omp end do
+c$omp end parallel
+
+      return
+      end
+

@@ -1,0 +1,44 @@
+#TESTCOMMAND: mppl -w
+# Translations for (mostly) slatec functions
+
+ifelse(WORDSIZE,64,
+[ifelse(RealSize,4,
+# Add Size4/UNICOS defs here
+
+,[ifelse(RealSize,8,
+# Add Size8/UNICOS defs here
+
+,[ifelse(RealSize,16,
+# Add Size16/UNICOS defs here
+
+,[Errprint(Unknown "RealSize": RealSize)]
+)]
+)]
+)]
+
+,[ifelse(RealSize,4,
+# Add Size4/SUNOS defs here
+
+,[ifelse(RealSize,8,
+# Add Size8/SUNOS defs here
+[define([scopy],[ifelse([$*],,[dcopy],[dcopy([$*])])])]
+[define([sdot],[ifelse([$*],,[ddot],[ddot([$*])])])]
+
+,[ifelse(RealSize,16,
+# Add Size16/SUNOS defs here
+[define([scopy],[ifelse([$*],,[dcopy],[dcopy([$*])])])]
+[define([sdot],[ifelse([$*],,[ddot],[ddot([$*])])])]
+
+,[Errprint(Unknown "RealSize": RealSize)]
+)]
+)]
+)]
+)
+
+# Example usage
+      subroutine foo
+      real x, sdot
+      external scopy, sdot
+      call scopy(N, SX, INCX, SY, INCY)
+      x = sdot (N, SX, INCX, SY, INCY)
+      end

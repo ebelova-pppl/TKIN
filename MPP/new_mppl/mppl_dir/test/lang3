@@ -1,0 +1,91 @@
+#TESTCOMMAND: mppl
+# nested loops
+
+      subroutine foo
+
+# label-less do
+      do i=1,10
+        print *, "hi"
+
+# while
+        i = 0
+        while (i<10)
+          i = i + 1
+          print *, "hi"
+        endwhile
+
+# until
+        i = 0
+        do
+          i = i + 1
+          print *, "hi"
+        until (i==10)
+
+# for
+        for (i=0,i<10,i=i+1)
+          for (j=0,j<10,j=j+1)
+            print *, "hi"
+          endfor
+        endfor
+
+      enddo
+
+      do 100 i=1,100
+        do 200 j=1,100
+          next 2   # next
+          break 2  # break
+ 200     continue
+ 100   continue
+
+      do 
+        do
+          next
+          break
+          next 1
+          break 1
+          next 2   # next
+          break 2  # break
+        enddo
+        next
+        break
+      enddo
+
+      do i=1,100
+        do j=1,100
+          next 2   # next
+          break 2  # break
+        enddo
+      enddo
+
+      do for i=1,100
+        do for j=1,100
+          next 2   # next
+          break 2  # break
+        enddo
+      enddo
+
+      for (i=0,i<imax,i=i+1)
+        next
+        break
+        for (j=0,j<jmax,j=j+1)
+          next 2   # next
+          break 2  # break
+        endfor
+      endfor
+
+      while (i<imax)
+        while (j<jmax)
+          next 2   # next
+          break 2  # break
+        endwhile
+      endwhile
+
+      do
+        do
+          next 2   # next
+          break 2  # break
+        until (j==10)
+      until (i==10)
+
+
+      end

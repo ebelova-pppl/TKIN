@@ -1,0 +1,111 @@
+cTESTCOMMAND: mppl
+c Test case statement
+
+
+c comment 0
+      subroutine foo
+cProlog
+
+c comment 1
+c comment 2
+c comment 3
+c comment 4
+c comment 5
+
+c comment 1a
+      x = 1.0
+c comment 1b
+      x = 2
+      y = "string here"
+      y = 'here'
+
+c select
+c comment A
+      i23000= token(2)
+         go to 23000
+c -- case 1
+23002 continue
+c comment B
+         call sedo
+23003    go to 23001
+c -- case 2
+23004 continue
+         call sewhile
+23005    go to 23001
+c -- case 3
+23006 continue
+c comment C
+         call sendif
+23007    go to 23001
+c -- case 4
+c -- case 7- 10
+23008 continue
+         call other
+23009    go to 23001
+c -- case 100
+23010 continue
+
+         call other100
+23011    go to 23001
+c -- case (default)
+23012 continue
+         call warn('end followed by improper keyword')
+c -- dispatch area for select
+23013 go to 23001
+23000 continue
+      if ( i23000 .eq. 1) go to 23002
+      if ( i23000 .eq. 2) go to 23004
+      if ( i23000 .eq. 3) go to 23006
+      if ( i23000 .eq. 4) go to 23008
+      if ( i23000 .ge. 7 .and. i23000 .le. 10) go to 23008
+      if ( i23000 .eq. 100) go to 23010
+      go to 23012
+23001 continue
+c endselect
+c comment D
+
+c select
+      i23014=a(2)
+         go to 23014
+c -- case 1
+23016 continue
+
+         call x
+c -- dispatch area for select
+23017 go to 23015
+23014 continue
+      if ( i23014 .eq. 1) go to 23016
+23015 continue
+c endselect
+
+c select
+c comment D
+      i23018=a +
+     &  1
+         go to 23018
+c -- case 1
+23020 continue
+
+         call x
+23021    go to 23019
+c -- case (default)
+23022 continue
+
+         call warn
+c -- dispatch area for select
+23023 go to 23019
+23018 continue
+      if ( i23018 .eq. 1) go to 23020
+      go to 23022
+23019 continue
+c endselect
+c comment E
+
+c comment 6
+      end
+
+
+c This is not converted because mppl currently will not process it.
+c      subroutine bar
+c        b = 1
+c      end subroutine bar

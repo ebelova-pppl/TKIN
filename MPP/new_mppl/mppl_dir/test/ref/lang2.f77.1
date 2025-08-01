@@ -1,0 +1,119 @@
+cTESTCOMMAND: mppl
+c Test loops -- labeled, block, while, until, for
+
+      subroutine foo
+cProlog
+
+c comment 1
+      do 100 i=1,10
+         print *, "hi"
+c comment 2
+  100    continue
+
+c label-less do
+c comment 3
+      do 23001 i=1,10
+         print *, "hi"
+23001 continue
+c comment 4
+
+c comment 3b
+      do 23003 i=1,10
+         print *, "hi"
+23003 continue
+c comment 4b
+
+c while
+      i = 0
+c while(i<10)
+23005 if (i.lt.10) then
+c comment 5
+         i = i + 1
+         print *, "hi"
+         go to 23005
+      endif
+c endwhile
+c comment 6
+
+c while(i<10)
+23007 if (i.lt.10) then
+c comment 5b
+         i = i + 1
+         print *, "hi"
+         go to 23007
+      endif
+c endwhile
+c comment 6b
+
+c until
+      i = 0
+c comment 7
+23009 continue
+         i = i + 1
+         print *, "hi"
+c until(i==10)
+      if ( .not. (i.eq.10) )go to 23009
+c comment 8
+
+c for
+c -- for([i=0,i<10,i=i+1])
+      i=0
+      go to 23011
+23012 continue
+         i=i+1
+c comment 9
+23011    if (.not.(i.lt.10)) go to 23013
+         print *, "hi"
+c -- repeat
+      go to 23012
+c comment 10
+23013 continue
+c endfor
+
+c -- for([i=0,i<10,i=i+1])
+      i=0
+      go to 23014
+23015 continue
+         i=i+1
+c comment 9b
+23014    if (.not.(i.lt.10)) go to 23016
+         print *, "hi"
+c -- repeat
+      go to 23015
+c comment 10b
+23016 continue
+c endfor
+
+c -- for([,i<10,i=i+1])
+
+      go to 23018
+23019 continue
+         i=i+1
+c null initial condition
+23018    if (.not.(i.lt.10)) go to 23020
+         print *, "hi"
+c -- repeat
+      go to 23019
+23020 continue
+c endfor
+
+c next and break
+      i = 0
+c comment 11
+23022 continue
+c comment 12
+         if (i .eq. 1) go to 23022
+         print *, "hi"
+         i = i + 1
+c comment 13
+         if (i .eq. 10) go to 23023
+c comment 14
+         go to 23022
+c comment 15
+         go to 23023
+c -- repeat
+      go to 23022
+c comment 16
+23023 continue
+
+      end

@@ -1,0 +1,46 @@
+!TESTCOMMAND: mppl
+
+      subroutine xxx
+                                       !Prolog
+
+      if (dog) &                       ! comment  1a
+         then
+         dog = 1
+      endif
+
+
+      if (dog) &                       ! comment 2a
+         return
+
+      if (dog) return                  ! comment 3a
+
+      do
+         if (dog) &                    ! comment 4a
+            exit                       ! comment 4b
+
+         if (dog) &                    ! comment 5a
+            cycle                      ! comment 5b
+      enddo
+
+      return                           ! comment 6
+      end subroutine 
+
+      function yyy
+                                       !Prolog
+
+      if (dog) &                       ! comment 7
+         then
+         yyy = 7
+         return
+      endif
+
+      if (dog) then
+         yyy = 8                       ! comment 8
+         return
+      endif
+
+      if (t .eq. DIGIT) then           !Old style, user supplied label for the end
+         dog = 1
+      endif
+
+      end function 

@@ -1,0 +1,59 @@
+cTESTCOMMAND: mppl
+
+      subroutine xxx
+cProlog
+
+c comment  1a
+      if (dog)
+     & then
+         dog = 1
+      endif
+
+
+c comment 2a
+      if (dog)
+     &   return
+
+c comment 3a
+      if (dog) return
+
+23000 continue
+c comment 4a
+         if (dog)
+c comment 4b
+     &      go to 23001
+
+c comment 5a
+         if (dog)
+c comment 5b
+     &      go to 23000
+c -- repeat
+      go to 23000
+23001 continue
+
+c comment 6
+      return
+      end
+
+      function yyy
+cProlog
+
+c comment 7
+      if (dog)
+     & then
+         yyy = 7
+         return
+      endif
+
+      if (dog) then
+c comment 8
+         yyy = 8
+         return
+      endif
+
+      if (t .eq. DIGIT) then
+cOld style, user supplied label for the end
+         dog = 1
+      endif
+
+      end

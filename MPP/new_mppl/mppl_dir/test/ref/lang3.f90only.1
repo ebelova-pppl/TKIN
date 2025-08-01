@@ -1,0 +1,115 @@
+!TESTCOMMAND: mppl
+! nested loops
+
+      subroutine foo
+
+! label-less do
+      do i=1,10
+        print *, "hi"
+
+! while
+        i = 0
+        do while (i.lt.10)
+          i = i + 1
+          print *, "hi"
+        enddo
+
+! until
+        i = 0
+        do
+          i = i + 1
+          print *, "hi"
+           if (i.eq.10)exit
+        enddo
+
+! for
+        i=0
+        do while (i.lt.10)
+          j=0
+          do while (j.lt.10)
+            print *, "hi"
+             j=j+1
+          enddo
+           i=i+1
+        enddo
+
+      enddo
+
+      do 100 i=1,100
+        do 200 j=1,100
+          go to   100   ! next
+          go to 23010  ! break
+ 200     continue
+ 100   continue
+23010  continue
+
+      do
+        do
+          cycle
+          exit
+          cycle
+          exit
+          go to 23012   ! next
+          go to 23013  ! break
+        enddo
+        cycle
+        exit
+23012    continue
+      enddo
+23013 continue
+
+      do i=1,100
+        do j=1,100
+          go to 23016   ! next
+          go to 23017  ! break
+        enddo
+23016    continue
+      enddo
+23017 continue
+
+      do i=1,100
+        do j=1,100
+          go to 23020   ! next
+          go to 23021  ! break
+        enddo
+23020    continue
+      enddo
+23021 continue
+
+      i=0
+      do while (i.lt.imax)
+        go to 23024
+        exit
+        j=0
+        do while (j.lt.jmax)
+          go to 23024   ! next
+          go to 23025  ! break
+           j=j+1
+        enddo
+23024    continue
+         i=i+1
+      enddo
+23025 continue
+
+      do while (i.lt.imax)
+        do while (j.lt.jmax)
+          go to 23028   ! next
+          go to 23029  ! break
+        enddo
+23028    continue
+      enddo
+23029 continue
+
+      do
+        do
+          go to 23032   ! next
+          go to 23033  ! break
+           if (j.eq.10)exit
+        enddo
+23032    continue
+         if (i.eq.10)exit
+      enddo
+23033 continue
+
+
+      end subroutine 

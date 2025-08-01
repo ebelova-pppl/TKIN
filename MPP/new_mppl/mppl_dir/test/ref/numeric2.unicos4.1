@@ -1,0 +1,83 @@
+cTESTCOMMAND: mppl -w
+c Test subsidiary intrinsic functions
+
+c Test "int()"
+      a = 1 .int. 2
+      a = int(1)
+      a = int(1)
+      a = int(1)
+      a = int(1)
+      a = int(1)
+      a = int(1)
+      a = int(1)
+      a = int(f(int(1),g(h(int(4)))))
+      a = int(f(int(1),g(h(int(4)))))
+
+c Test "nint()"
+      a = nint(1)
+      a = nint(1)
+      a = nint(1)
+      a = nint(1)
+      a = nint(1)
+      a = nint(1)
+      a = nint(1)
+      a = nint(f(nint(1),g(h(nint(4)))))
+      a = nint(f(nint(1),g(h(nint(4)))))
+
+c Test "aint()"
+      a = aint(real(1.0))
+      a = aint(real(1.0))
+      a = aint(real(1.0))
+      a = aint(real(1.0))
+      a = aint(real(1.0d0))
+      a = aint(dble(1.0))
+      a = aint(real(1.0))
+      a = aint(real(1.0))
+      a = aint(real(1.0))
+      a = aint(real(1.0))
+      a = aint(real(1.0d0))
+      a = aint(dble(1.0))
+      a = aint(real(f(aint(real(1.2)))))
+      a = aint(real(f(aint(real(1.2)))))
+
+c Test "anint()"
+      a = anint(real(1.0))
+      a = anint(real(1.0))
+      a = anint(real(1.0))
+      a = anint(real(1.0))
+      a = anint(real(1.0d0))
+      a = anint(dble(1.0))
+      a = anint(real(1.0))
+      a = anint(real(1.0))
+      a = anint(real(1.0))
+      a = anint(real(1.0))
+      a = anint(real(1.0d0))
+      a = anint(dble(1.0))
+      a = anint(real(f(anint(real(1.2)))))
+      a = anint(real(f(anint(real(1.2)))))
+
+c Test "cmplx()": Takes 1, 2, or 3 args
+      a = cmplx(1.0)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0d0)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0d0)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0,2.0)
+      a = cmplx(f(cmplx(1.0, 2.0), 2.0), 1.)
+      a = cmplx(f(cmplx(1.0, 2.0),2.0), 1.)
+
+c Test "aimag" and "conjg"
+      a = aimag(z+y*x)
+      a = conjg(z+y*x)

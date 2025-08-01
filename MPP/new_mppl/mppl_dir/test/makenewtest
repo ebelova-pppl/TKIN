@@ -1,0 +1,67 @@
+#!/bin/ksh
+# Create a set of test output files from a given test input file.
+# The test input files should be named "input1", "input2", etc.
+# Each input file creates 12 output files, some of which may be empty.
+
+trap "rm -f $outfiles; exit" INT
+
+function die
+{
+    print $1
+    exit 1
+}
+
+function getcommand
+{
+   read junk comm < $1
+   print "$comm"
+}
+
+function CreateFiles
+{
+    MPPL=$(getcommand $3)
+    print "Creating $4.1 and $4.2"
+    outfiles="$outfiles $4.1 $4.2"
+    eval ../$MPPL $1 $2 <$3 >$4.1 2>$4.2
+}
+
+
+####### MAIN Program
+
+if [[ $# = 0 ]]
+then
+    cat <<XXX
+
+makenewtest creates a set of OUTPUT files from a given test INPUT file.
+Your input file should have the next name in the series "input1", "input2",
+etc.  Look in directory Test to pick the proper name.  Each input file
+will create 12 output files, some of which may be empty.  They
+correspond to mppl's stdout and stderr for each of the flag settings
+"-r<4,8,16>" and "-t<LINUX,UNICOS>".
+
+XXX
+
+    read -r i?"Enter Input filename: " || die
+    case $i in
+	input[0-9]*) ;;
+	*)   die "Bad input name, read instructions" ;;
+    esac
+    set -- $i
+fi
+
+integer n=${1#input}
+
+[[ -r $1 ]] || die "Can't read input file: $1"
+
+CreateFiles -r4 -tLINUX $1 fid$n.L4
+CreateFiles -r4 -tUNICOS $1 fid$n.U4
+CreateFiles -r8 -tLINUX $1 fid$n.L8
+CreateFiles -r8 -tUNICOS $1 fid$n.U8
+CreateFiles -r16 -tLINUX $1 fid$n.L16
+CreateFiles -r16 -tUNICOS $1 fid$n.U16
+
+cat <<YYY
+
+The output files have been created.  Run "make test" to verify that the
+new test is ok.
+YYY

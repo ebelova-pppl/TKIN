@@ -1,0 +1,6131 @@
+cMPPL (c) Copyright 1986, 1987 Regents of the University of California
+c                   All rights reserved.
+cMPPL (c) Copyright 1986, 1987 Regents of the University of California
+c                   All rights reserved.
+cparameter file for mppl
+c unit specifiers
+clogic for include statement requires this one bigger than others
+c
+c sizes
+c
+c lexical
+c types
+c
+c builtin flags
+cvalues for do statement types
+c select parameters
+c value for domath
+c include files
+c CERR
+
+c CARGS
+
+c CFILE
+
+c CLABS
+
+c CLOOK
+
+c CMACRO
+ccurrent call stack pointer
+cnext free position in evalst
+cline,file at which macro began
+cevaluation stack
+
+c CSTAT
+c current select entry; init = 0
+c next available position; init = 1
+c select information
+c select depth
+c label that started this select
+
+c CTYPE
+
+c CONE
+c array of actions(shift,reduce,etc)
+c array  of states corresponding to act1
+c array of next states after reduction
+c stack of states,stack top
+c stack of tokens, stack top
+
+c ICOM
+
+      block data mppldata
+
+      integer ap,argstk(30),callst(30),nlb,plev(30)
+      common /cargs/ ap,argstk,callst,nlb,plev
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+
+      character*(8) act1 
+      integer act2, move, stray,stop, numray,numtop 
+      common /ceo/ act1(26)
+      common /ceo1/ act2(26,8), move(26,4)
+      common /ceo2/ stray(125), stop, numray(125), numtop
+
+
+      integer labnxt,laborg
+      common /labg/labnxt,laborg
+
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+
+      integer icompile
+      common /icom/ icompile
+
+      data basis /1/
+      data laborg/23000/
+      data col72/72/
+      data lastp/0/,lastt/0/
+      data hshtab/501 * 0/
+      data nextdef/5000 * 0/
+      data defupcas/0/
+      data (ustck(i),i=1,5000)/5000*0/
+      data ptop/5000/
+c
+c act1,act2 indexed by current state and input
+c columns 1-8 correspond to: ( ) * + int - eof /
+c
+      data act1(1)/'eeeeeeee'/
+      data act1(2)/'seeessee'/
+      data act1(3)/'seeessee'/
+      data act1(4)/'seeeseee'/
+      data act1(5)/'errrerrr'/
+      data act1(6)/'eeesesee'/
+      data act1(7)/'eeeeeeae'/
+      data act1(8)/'errrerrr'/
+      data act1(9)/'ersrerrs'/
+      data act1(10)/'eseeeeee'/
+      data act1(11)/'eeesesee'/
+      data act1(12)/'ersrerrs'/
+      data act1(13)/'seeeseee'/
+      data act1(14)/'seeeseee'/
+      data act1(15)/'eeeeeeae'/
+      data act1(16)/'seeeseee'/
+      data act1(17)/'seeeseee'/
+      data act1(18)/'errrerrr'/
+      data act1(19)/'seeeseee'/
+      data act1(20)/'seeeseee'/
+      data act1(21)/'ersrerrs'/
+      data act1(22)/'ersrerrs'/
+      data act1(23)/'errrerrr'/
+      data act1(24)/'errrerrr'/
+      data act1(25)/'ersrerrs'/
+      data act1(26)/'ersrerrs'/
+      data (act2(1,i), i=1,8) /8*1/
+      data (act2(2,i), i=1,8) /3,3*1,5,4,2*1/
+      data (act2(3,i), i=1,8) /3,1,1,1,5,4,1,1/
+      data (act2(4,i), i=1,8) /3,3*1,5,3*1/
+      data (act2(5,i), i=1,8) /1,3*14,1,3*14/
+      data (act2(6,i), i=1,8) /3*1,13,1,14,2*1/
+      data (act2(7,i), i=1,8) /8*1/
+      data (act2(8,i), i=1,8) /1,3*11,1,3*11/
+      data (act2(9,i), i=1,8) /1,2,16,8,1,8,2,17/
+      data (act2(10,i), i=1,8) /1,18,6*1/
+      data (act2(11,i), i=1,8) /3*1,19,1,20,2*1/
+      data (act2(12,i), i=1,8) /1,3,16,8,1,8,3,17/
+      data (act2(13,i), i=1,8) /3,3*1,5,3*1/
+      data (act2(14,i), i=1,8) /3,3*1,5,3*1/
+      data (act2(15,i), i=1,8) /8*1/
+      data (act2(16,i), i=1,8) /3,3*1,5,3*1/
+      data (act2(17,i), i=1,8) /3,3*1,5,3*1/
+      data (act2(18,i), i=1,8) /1,3*15,1,3*15/
+      data (act2(19,i), i=1,8) /3,3*1,5,3*1/
+      data (act2(20,i), i=1,8) /3,3*1,5,3*1/
+      data (act2(21,i), i=1,8) /1,4,16,9,1,9,4,17/
+      data (act2(22,i), i=1,8) /1,6,16,10,1,10,6,17/
+      data (act2(23,i), i=1,8) /1,3*12,1,3*12/
+      data (act2(24,i), i=1,8) /1,3*13,1,3*13/
+      data (act2(25,i), i=1,8) /1,5,16,9,1,9,5,17/
+      data (act2(26,i), i=1,8) /1,7,16,10,1,10,7,17/
+c
+c move indexed by stray(stop) and current non-terminal
+c from grammar
+c columns 1-4 correspond to: E  E'  T  F
+c
+      data (move(1,i), i=1,4) /4*1/
+      data (move(2,i), i=1,4) /7,6,9,8/
+      data (move(3,i), i=1,4) /10,6,9,8/
+      data (move(4,i),i=1,4) /1,11,12,8/
+      data (move(5,i), i=1,4) /4*1/
+      data (move(6,i), i=1,4) /4*1/
+      data (move(7,i), i=1,4) /4*1/
+      data (move(8,i), i=1,4) /4*1/
+      data (move(9,i), i=1,4) /4*1/
+      data (move(10,i), i=1,4) /4*1/
+      data (move(11,i), i=1,4) /4*1/
+      data (move(12,i), i=1,4) /4*1/
+      data (move(13,i), i=1,4) /2*1,21,8 /
+      data (move(14,i), i=1,4) /2*1,22,8/
+      data (move(15,i), i=1,4) /4*1/
+      data (move(16,i), i=1,4) /3*1,23/
+      data (move(17,i), i=1,4) /3*1,24/
+      data (move(18,i), i=1,4) /4*1/
+      data (move(19,i), i=1,4) /2*1,25,8/
+      data (move(20,i), i=1,4) /2*1,26,8/
+      data (move(21,i), i=1,4) /4*1/
+      data (move(22,i), i=1,4) /4*1/
+      data (move(23,i), i=1,4) /4*1/
+      data (move(24,i), i=1,4) /4*1/
+      data (move(25,i), i=1,4) /4*1/
+      data (move(26,i), i=1,4) /4*1/
+
+      data icompile/0/
+c
+      end
+cMPPL (c) Copyright 1986, 1987 Regents of the University of California
+c                   All rights reserved.
+      subroutine bltin
+cProlog
+
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+c install names and defns of define, ifelse, etc... in table
+      character c
+c
+c initialize pointer stack
+      do 23000 i=1,5000 
+         pstck(i)=5000 + 1 - i
+23000 continue
+c
+      c = char(200)
+      call cnstal('define',c)
+c
+      call getsys(sysnam)
+      call cnstal('SYSTEM',sysnam)
+c
+      call cnstal('Prolog','#Prolog')
+c
+      c = char(207)
+      call cnstal('Module',c)
+c
+      c = char(202)
+      call cnstal('ifdef',c)
+c
+      c = char(201)
+      call cnstal('ifelse',c)
+c
+      c =char(203)
+      call cnstal('Errprint',c)
+c
+      c=char(204)
+      call cnstal('Dumpdef',c)
+c
+      c=char(205)
+      call cnstal('Evaluate',c)
+c
+      c=char(206)
+      call cnstal('Immediate',c)
+c
+      c=char(226)
+      call cnstal('include',c)
+c
+      c=char(211)
+      call cnstal('do',c)
+c
+      c=char(208)
+      call cnstal('enddo',c)
+c
+      c=char(210)
+      call cnstal('next',c//' $1')
+c
+      c=char(209)
+      call cnstal('break',c//' $1')
+c
+      c=char(240)
+      call cnstal('program',c)
+c
+      c=char(241)
+      call cnstal('subroutine',c)
+c
+      c=char(242)
+      call cnstal('function',c)
+c
+      c=char(244)
+      call cnstal('end',c)
+c
+      c=char(243)
+      call cnstal('return',c//'ifelse($1,,,($1))')
+c
+      c=char(212)
+      call cnstal('while',c//
+     &'ifelse($1,,,[Immediate([c while($1)])])($1)')
+c
+      c=char(214)
+      call cnstal('endwhile',c)
+c
+      c=char(213)
+      call cnstal('until',c//
+     &'ifelse($1,,,[Immediate([c until($1)])])($1)')
+c
+      c=char(215)
+      call cnstal('if',c//'($1)')
+c
+      c=char(216)
+      call cnstal('else',c)
+c
+      c=char(218)
+      call cnstal('elseif',c//'($1)')
+c
+      c=char(217)
+      call cnstal('endif',c)
+c
+      c=char(219)
+      call cnstal('then',c)
+c
+      c=char(220)
+      call cnstal('select',c//'ifelse($1,,, = $1)')
+c
+      c=char(221)
+      call cnstal('case',c//'$1')
+c
+      c=char(222)
+      call cnstal('default',c//'$1')
+c
+      c=char(223)
+      call cnstal('endselect',c)
+c
+      c=char(224)
+      call cnstal('for',c//'ifelse([$2],,,'//
+     &'[Immediate([c -- for($*)])$1;go to @1;do;$3;@1 if(.not.($2)) brea
+     &k])')
+c
+      c=char(225)
+      call cnstal('endfor',c)
+c
+      c=char(245)
+      call cnstal('Undefine',c)
+c
+      c=char(246)
+      call cnstal('block',c)
+c
+      nbuilt = lastp
+      return 
+      end
+      subroutine cnstal(cname,cdef)
+cProlog
+
+cinstal a definition, character string
+cmaximum lengths for name and defn 32 and 256 THIS ROUTINE ONLY
+      integer name(32),def(256),i
+      character*(*) cname,cdef
+      integer lname,ldef
+c
+      lname = len(cname)
+      ldef = len(cdef)
+      if(lname .gt. 32 .or. ldef .gt. 256) call oops(
+     &'cnstal: name or defn too long')
+      do 23000 i=1,lname
+         name(i) = ichar(cname(i:i))
+23000 continue
+      do 23002 i=1,ldef
+         def(i) = ichar(cdef(i:i))
+         if(def(i) .lt. 0) def(i) = def(i) + 256
+23002 continue
+      call instal(name,lname,def,ldef)
+      return 
+      end
+      subroutine cpbstr(str)
+cProlog
+
+cpushes back character string str
+      character*(*) str
+      integer i,j,n
+c
+      n = len(str)
+      do 23000 j=1,n
+         i = n + 1 - j
+         call putbak(ichar(str(i:i)))
+23000 continue
+      return 
+      end
+c
+      subroutine doblock
+cProlog
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+c this routine process a block of declarations
+c but right now it doesn't do a whole lot
+      integer t,gnbtok,dta(4)
+      external gnbtok
+c
+      call outtab
+      call putqs('block ')
+c look for the word data
+cd
+      dta(1) = 100 
+ca
+      dta(2) = 97 
+ct
+      dta(3) = 116 
+ca
+      dta(4) = 97 
+      t = gnbtok(token,ltoken)
+      call putchr(token,ltoken)
+      if(icomp(token,ltoken,dta,4) .eq. 0) then
+cnot a block data statement after all
+         call eatup
+         return 
+      endif
+c next should be the module name
+      t = gnbtok(token,ltoken)
+      call putchr(token,ltoken)
+      if(ltoken .gt. 32) call warn('block module name too long')
+      ltoken = min(ltoken,32)
+      call setmod(token,ltoken)
+      call eatup
+      return 
+      end
+c
+      function docond()
+cProlog
+
+c evaluate and put out conditional
+ctranslate >, >=, <,<=,~, ~=, <>, = or ==, ~ , ~=, &, |
+c argument is a dummy, not used
+c returns 0 if o.k., 1 otherwise
+      integer docond,dum
+      integer t,nlev
+      integer gtok,gnbtok
+      external gtok,gnbtok
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      t = gnbtok(token,ltoken)
+      if( t .ne. 40) then
+         call warn('Missing condition.')
+         docond                           = (1)
+         return
+      endif
+      call putqs('(')
+      nlev = 1
+c while(nlev > 0)
+23000 if(nlev .gt. 0)  then
+         t = gtok(token,ltoken)
+         if(t .eq. 40) then
+            nlev = nlev + 1
+            call putchr(40,1)
+         elseif(t .eq. 41) then
+            nlev = nlev - 1
+            call putchr(41,1)
+         elseif( t .eq. 38 ) then
+            call putqs('.and.')
+         elseif( t .eq. 124) then
+            call putqs('.or.')
+         elseif( t .eq. 61) then
+            call putqs('.eq.')
+            t = gtok(token,ltoken)
+c ok to have = or ==
+            if( t .ne. 61) then
+               call pbstr(token,ltoken)
+            endif
+         elseif( t .eq. 126) then
+            t = gtok(token,ltoken)
+            if( t .ne. 61) then
+               call pbstr(token,ltoken)
+               call putqs('.not.')
+            else
+               call putqs('.ne.')
+            endif
+         elseif( t .eq. 60) then
+            t = gtok(token,ltoken)
+            if( t .eq. 61) then
+               call putqs('.le.')
+            elseif(t .eq. 62) then
+               call putqs('.ne.')
+            else
+               call pbstr(token,ltoken)
+               call putqs('.lt.')
+            endif
+         elseif( t .eq. 62) then
+            t = gtok(token,ltoken)
+            if( t .eq. 61) then
+               call putqs('.ge.')
+            elseif(t .eq. 60) then
+               call putqs('.ne.')
+            else
+               call pbstr(token,ltoken)
+               call putqs('.gt.')
+            endif
+         elseif( t .eq. 13) then
+            call warn('Missing right parenthesis in condition.')
+            docond                           = (1)
+            return
+         else
+            call putchr(token,ltoken)
+         endif
+         go to 23000
+      endif
+c endwhile
+      call putchr(32,1)
+      docond                           = (0)
+      return
+      end
+      subroutine dodef(argstk,i,j)
+cProlog
+
+cdodef -- install definition in table
+      integer a1,a2,a3,argstk(1),i,j,jloc
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      integer t,gettok
+      external gettok
+      if(j .gt. i + 3) call oops('Wrong number of arguments in define.')
+      jloc = j
+   50 continue
+c if called as a macro:
+      a1 = argstk(i+2)
+      a2 = argstk(i+3)
+      lname = a2-a1
+      if( lname .eq. 0 ) go to 100
+      if( jloc .eq. i+3) then
+         a3 = argstk(i+4)
+      else
+         a3 = a2
+      endif
+      call instal(evalst(a1),a2-a1,evalst(a2),a3-a2)
+      return 
+carguments not supplied, go get them
+  100 continue 
+c note that this routine is called from eval called from gtok,
+c so we can only use gettok , not gnbtok or gtok
+      t = gettok(token,ltoken)
+      if(t .eq. 131) t = gettok(token,ltoken)
+      if(t .ne. 130) call oops('define not followed by name')
+      do 23000 k=1,ltoken
+         evalst(argstk(i+2)-1+k)=token(k)
+23000 continue
+      argstk(i+3) = argstk(i+2) + ltoken
+      argstk(i+4) = argstk(i+3)
+      jloc = i + 3
+c eatup rest of line as definition
+      t = gettok(token,ltoken)
+      if(t.eq.131) t=gettok(token,ltoken)
+c while(t <> 13)
+23002 if(t .ne. 13)  then
+         do 23004 k=1,ltoken
+            evalst(argstk(i+4) - 1 + k) = token(k)
+23004    continue
+         argstk(i+4) = argstk(i+4) + ltoken
+         t = gettok(token,ltoken)
+         go to 23002
+      endif
+c endwhile
+      go to 50
+      end
+      subroutine dodmp(argstk,i,j)
+cProlog
+
+      integer i,j,argstk(1)
+      integer jj,k,a1,a2
+      integer lookup
+      external lookup
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+      do 23000 k = i + 2 ,j
+         a1 = argstk(k)
+         a2 = argstk(k+1)
+         if(a2.eq.a1) then
+            do 23002 jj=nbuilt + 1,lastp
+               call dumpdf(ustck(jj))
+23002       continue
+         else
+c while(type(evalst(a1)) == 131 & a1 <a2)
+23004       if(type(evalst(a1)) .eq. 131 .and. a1 .lt.a2)  then
+               a1 = a1 + 1
+               go to 23004
+            endif
+c endwhile
+c while(type(evalst(a2-1)) == 131 & a1 <a2)
+23006       if(type(evalst(a2-1)) .eq. 131 .and. a1 .lt.a2)  then
+               a2 = a2 - 1
+               go to 23006
+            endif
+c endwhile
+            jj = lookup(evalst(a1),a2-a1)
+            call dumpdf(jj)
+         endif
+23000 continue
+      return 
+      end
+      subroutine doend
+cProlog
+
+      integer gnbtok
+      external gnbtok
+      integer t
+c handles end, end do, end while, end if
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+c sure, we've seen an end, but did they really mean it ?
+      t = gnbtok(token,ltoken)
+      if(t .eq. 211) then
+cit is end do => enddo
+         call sedo
+      elseif(t .eq. 212) then
+cit is endwhile
+         call sewhile
+      elseif(t .eq. 215) then
+c it is endif
+         call sendif
+      elseif(t .eq. 224) then
+         call sefor
+      elseif(t .eq. 220) then
+         call seselect
+cit really is an end
+      else
+         ierr = 0
+         if(level .ne. 0) then
+            call inform('do-block level not 0 at end.')
+            ierr = 1
+         elseif(iflevel .ne. 0) then
+            call inform('if-block level not 0 at end.')
+            ierr = 1
+         elseif(sellev .ne. 0) then
+            call inform('select statement level not 0 at end.')
+            ierr = 1
+         endif
+         level = 0 
+         iflevel = 0 
+         sellev = 0
+         call setmod(63,1)
+         modfun = 0
+         call outtab
+         call putqs('end')
+         call outlin
+c reset the label generator
+         call reset
+         if(t .ne. 13 .and. ierr .eq. 0 ) call spit
+      endif
+      return 
+      end
+      subroutine doerrp(argstk,i,j)
+cProlog
+
+      integer a1,a2,argstk(1),i,j,larg,iarg,kk
+      character*80 msg
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+      do 23000 iarg = i + 2, j
+         a1 = argstk(iarg)
+         a2 = argstk(iarg+1)
+         msg = 'mppl: '
+         larg = min(a2-a1,73)
+         do 23002 kk= 1, larg
+            msg(kk+5:kk+5) = char(evalst(a1-1+kk))
+23002    continue
+         msg(larg+6:larg+6) = char(7)
+         call rem(msg,larg+6)
+23000 continue
+      return 
+      end
+      subroutine dofile(fil)
+cProlog
+
+      character*(*) fil
+      integer gnbtok,toktoi
+      external gnbtok,toktoi
+      integer t,blanks(5)
+      integer idoflg
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+
+      integer ap,argstk(30),callst(30),nlb,plev(30)
+      common /cargs/ ap,argstk,callst,nlb,plev
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      do 23000 i=1,5
+         blanks(i) = 32
+23000 continue
+c
+      call initio(fil)
+c reset the label counter
+      call reset
+c initialize the argument stack
+      cp = 0
+      ap = 1
+      ep = 1
+c count of square brackets
+      nlb = 0
+c do/while/if levels
+      level = 0
+      iflevel = 0
+      dotype(0) = 0
+      labn(0) = 0
+      labb(0) = 0
+      used(0) = 0
+c select stuff
+      seltop = 0
+      sellev = 0
+      sellast = 1
+      if( basis .gt. 0) then
+         if(sysnam.eq.'UNIX') then
+            call bdunix
+         elseif(sysnam.eq.'LTSS') then
+            call bdltss
+         elseif(sysnam.eq.'NLTSS') then
+            call bdnlts
+         elseif(sysnam.eq.'CTSS') then
+            call bdctss
+         elseif(sysnam.eq.'UNICOS') then
+            call bdunix
+         else
+            call bdunix
+         endif
+cget system-independent Basis definitions
+         call getb 
+         basis = 0
+      endif
+c module name
+      call setmod(63,1)
+c idoflg = YES after seeing the label which terminates a regular do
+      idoflg = 0
+c process this file
+c gtok returns the next token after expanding macros
+c each for loop does one statement
+c -- for(t=gnbtok(token,ltoken), t <> 28 , t=gnbtok(token,ltoken))
+      t=gnbtok(token,ltoken)
+      go to 23002
+23003 continue
+         t=gnbtok(token,ltoken)
+23002    if(.not.( t .ne. 28 )) go to 23004
+c if the previous statement was the end of a standard do statement...
+         if(idoflg .eq. 1) then
+            call sedo
+            idoflg = 0
+         endif
+
+         if( t .eq. 129) then
+            call putchr(blanks,5-ltoken)
+            call putchr(token,ltoken)
+            if(dotype(level) .eq. 1) then
+               if(labn(level) .eq. toktoi(token,ltoken)) then
+                  idoflg = 1
+               endif
+            endif
+            call outtab
+            t = gnbtok(token,ltoken)
+         endif
+ 1000    go to (1,2,3,4,5,6,7,8,9,10, 11,12,13,14,15,16,17,18,19,20,21,
+     &22,23),decide(t)
+c do
+    2    call sdo
+         go to 23003
+c enddo
+    3    call sedo
+         go to 23003
+c next
+    4    call snext
+         go to 23003
+cbreak
+    5    call sbrk
+         go to 23003
+cuntil
+    6    call suntil
+         go to 23003
+cwhile
+    7    call swhile
+         go to 23003
+cendwhile
+    8    call sewhile
+         go to 23003
+cif
+    9    call sif
+         go to 23003
+celseif
+   10    call selif
+         go to 23003
+c else
+   11    call selse
+         go to 23003
+cendif
+   12    call sendif
+         go to 23003
+c program, subroutine, function
+   13    continue
+c domod might need to be called by eatup to handle 'type function blahblah..'
+c so domod does not do the eatup since it might get called by eatup
+         call outtab
+         call domod(t)
+         call eatup
+         call prolog
+         go to 23003
+c end
+   14    call doend
+         go to 23003
+c return
+   15    call doret
+         go to 23003
+c inclusion
+   16    call doinc
+         go to 23003
+c blank line
+   17    if(bckeep) call outlin
+         go to 23003
+c for -- discard marker character (used just to detect 'end for')
+c rest of for accomplished with what was pushed back from arguments
+   18    t = gnbtok(token,ltoken)
+         go to 1000
+c endfor
+   19    call sefor
+         go to 23003
+c select
+   20    call sselect
+         go to 23003
+c case, default
+   21    call scase(t)
+         go to 23003
+c endselect
+   22    call seselect
+         go to 23003
+c block
+   23    call doblock
+         go to 23003
+c other
+cget past label field
+    1    call outtab 
+         call putchr(token,ltoken)
+         call eatup
+c -- repeat
+      go to 23003
+23004 continue
+c endfor
+      if(level .ne. 0) call warn('do-block level not 0 at end of file.')
+      if(iflevel .ne. 0) call warn(
+     &'if-block level not 0 at end of file.')
+      if(sellev .ne. 0) call warn(
+     &'select statement level not 0 at end of file.')
+      if( modnam(1) .ne. 63) call warn(
+     &'Probably a missing end statement.')
+c note, the file got closed by getlin
+      return 
+      end
+      subroutine doif(argstk,i,j)
+cProlog
+
+      integer a1,a2,a3,a4,a5,argstk(1),i,j
+      integer i0,e1,e2
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+      i0 = i + 2
+      if( i0 + 2 .le. j) then
+cfirst argument
+         a1= argstk(i0) 
+cequals second argument ?
+         a2= argstk(i0+1) 
+c if so push back third argument
+         a3= argstk(i0+2) 
+c else fourth
+         a4= argstk(i0+3) 
+         e1 = a2-1
+         e2 = a3-1
+c while((a1 < a2) & (type(evalst(a1)) = 131))
+23000    if((a1 .lt. a2) .and. (type(evalst(a1)) .eq. 131))  then
+            a1 = a1 + 1
+            go to 23000
+         endif
+c endwhile
+c while((e1 > a1) & (type(evalst(e1)) = 131))
+23002    if((e1 .gt. a1) .and. (type(evalst(e1)) .eq. 131))  then
+            e1 = e1 - 1
+            go to 23002
+         endif
+c endwhile
+         e1 = e1 + 1
+c while((a2 < a3) & (type(evalst(a2)) = 131))
+23004    if((a2 .lt. a3) .and. (type(evalst(a2)) .eq. 131))  then
+            a2 = a2 + 1
+            go to 23004
+         endif
+c endwhile
+c while((e2 > a2) & (type(evalst(e2)) = 131))
+23006    if((e2 .gt. a2) .and. (type(evalst(e2)) .eq. 131))  then
+            e2 = e2 - 1
+            go to 23006
+         endif
+c endwhile
+         e2 = e2 + 1
+
+         if( e1-a1 .eq. e2-a2) then
+            do 23008 k=0,e1-a1-1
+               if(evalst(a1 + k) .ne. evalst(a2+k)) go to 50
+23008       continue
+carg1 = arg2
+            call pbstr(evalst(a3),a4-a3)
+            return 
+         endif
+carg1 <> arg2
+   50    continue
+         if( i0 + 3 .le.j) then
+c is fourth arg. present?
+            a5 = argstk(i0+4)
+            call pbstr(evalst(a4),a5-a4)
+         endif
+      endif
+      return 
+      end
+      subroutine doifdf(argstk,i,j)
+cProlog
+
+      integer lookup
+      external lookup
+      integer a1,a2,a3,a4,e1,argstk(1),i,j
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+      i0=i+2
+      if( i0 + 1 .gt.j) then
+         return 
+      endif
+      a1= argstk(i0)
+      a2= argstk(i0+1)
+      a3= argstk(i0+2)
+c while((a1 < a2) & (type(evalst(a1)) = 131))
+23000 if((a1 .lt. a2) .and. (type(evalst(a1)) .eq. 131))  then
+         a1 = a1 + 1
+         go to 23000
+      endif
+c endwhile
+      e1 = a2-1
+c while((e1 > a1) & (type(evalst(e1)) = 131))
+23002 if((e1 .gt. a1) .and. (type(evalst(e1)) .eq. 131))  then
+         e1 = e1 - 1
+         go to 23002
+      endif
+c endwhile
+      e1 = e1 + 1
+      if(lookup(evalst(a1),e1-a1) .gt. 0 ) then
+carg1 IS defined
+         call pbstr(evalst(a2),a3-a2)
+      else
+         if(i0+2 .le.j) then
+cit isn't
+            a4 = argstk(i0+3)
+            call pbstr(evalst(a3),a4-a3)
+         endif
+      endif
+      return 
+      end
+      subroutine doimed(argstk,i,j)
+cProlog
+
+c if argument exists, blast it out immediately to output file
+      integer a1,a2,argstk(1),i,j,larg,iarg,kk
+      character*80 msg
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      do 23000 iarg = i + 2, j
+         a1 = argstk(iarg)
+         a2 = argstk(iarg+1)
+         larg = min(a2-a1,73)
+         if(larg .eq. 0) then
+            return 
+         endif
+         call zpakchrz(msg,evalst(a1),larg)
+         call wrline(iusout,msg,larg)
+23000 continue
+      return 
+      end
+      subroutine doinc
+cProlog
+
+c include file named in next token
+      integer gnbtok
+      external gnbtok
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      character*80 fil
+      integer t,i
+c
+      fil = ' '
+      n = len(fil)
+      j = 0
+c -- for(t=gnbtok(token,ltoken), t <> 13 , t=gnbtok(token,ltoken))
+      t=gnbtok(token,ltoken)
+      go to 23000
+23001 continue
+         t=gnbtok(token,ltoken)
+23000    if(.not.( t .ne. 13 )) go to 23002
+         if(j + ltoken .gt. n) call oops('Filename too long in include')
+         do 23003 i=1,ltoken
+            fil(j+i:j+i) = char(token(i))
+23003    continue
+         j = j + ltoken
+c -- repeat
+      go to 23001
+23002 continue
+c endfor
+c save current contents of pbbuf
+      if(pbbuf(1) .eq. 1) then
+         cbsav(inlev) = cbuf(1:lcbuf)
+         lcsav(inlev) = lcbuf
+      endif
+      pblinl(inlev) = bp
+      do 23005 i=1,bp
+         pblins(i,inlev) = pbbuf(i)
+23005 continue
+c arrange for input to come from the new file
+      bp = 0
+      if(inlev .eq. 5) call oops('Includes nested too deeply')
+      inlev = inlev + 1
+      filnam(inlev) = fil
+      yyline(inlev) = 0
+      if( filnam(inlev) .eq. '__tty__') then
+         iusin(inlev) = 5
+         call howend
+         call mprompt('mppl> ',5)
+      else
+         iusin(inlev) = 8 + inlev - 1
+         call fopen(iusin(inlev),filnam(inlev),ierr)
+         if(ierr .ne. 0) go to 200
+      endif
+      return 
+  200 continue
+      call oops('  ****Could not open include file: '//filnam(inlev))
+      end
+      subroutine domod(td)
+cProlog
+
+      integer td,gnbtok
+      external gnbtok
+      integer t
+c handles program,subroutine,function
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      if(modnam(1) .ne. 63) then
+         call warn('Nested subroutine, function or program.')
+         return 
+      endif
+      t = gnbtok(token,ltoken)
+      if(t .ne. 130) then
+         call warn('subroutine,function, or program statement error.')
+         return 
+      endif
+      if(ltoken .gt. 32) then
+         call warn('Module name too long.')
+         return 
+      endif
+      call setmod(token,ltoken)
+      if(td .eq. 240) then
+         call putqs('program ')
+      elseif(td .eq. 241 ) then
+         call putqs('subroutine ')
+      else
+         call putqs('function ')
+      endif
+      call putchr(token,ltoken)
+      if(td .eq. 242) then
+         modfun = 1
+      else
+         modfun = 0
+      endif
+      return 
+      end
+      subroutine doret
+cProlog
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      integer t,gnbtok,gtok
+      external gnbtok,gtok
+      integer nlev
+c look for value to be returned
+      t = gnbtok(token,ltoken)
+      if( t .eq. 40) then
+creturn for function value
+         if(modfun .eq. 0) then
+            call warn('Attempt to return value from subroutine.')
+            return 
+         endif
+         call outtab
+         call putchr(modnam,32)
+         call putqs(' = (')
+         nlev = 1
+c while(nlev > 0)
+23000    if(nlev .gt. 0)  then
+            t = gtok(token,ltoken)
+            call putchr(token,ltoken)
+            if(t .eq. 40) then
+               nlev = nlev + 1
+            elseif(t .eq. 41) then
+               nlev = nlev - 1
+            elseif( t .eq. 13) then
+               call warn('Missing right parenthesis.')
+               return 
+            endif
+            go to 23000
+         endif
+c endwhile
+         call eatup
+         call outtab
+         call putqs('return')
+         call outlin
+cregular return statement
+      else
+         call outtab
+         call putqs('return ')
+         if(t .ne. 13) then
+            call putchr(token,ltoken)
+            call eatup
+         else
+            call outlin
+         endif
+      endif
+      return 
+      end
+      subroutine dumpdf(jj)
+cProlog
+
+c dump defn number jj
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+      integer i,k,ii,ldef,lout,ibase
+      integer validp
+      external validp
+      character out(80)
+      if( validp(jj) .gt. 1 ) then
+         write(0,90)
+   90    format(' dumpdef: name is not defined')
+         return 
+      endif
+      lout = namlen(jj)
+      do 23000 ii=1,lout
+         k = table(namptr(jj) - 1 + ii)
+         out(ii) = char(k)
+23000 continue
+      call rem(out(1),lout)
+      if(validp(jj) .eq. 0) then
+         write(0,101)
+         return 
+      endif
+      ldef = deflen(jj)
+      ibase = defptr(jj)
+      ii = 0
+      do 23002 i = 1,ldef
+         k = table(ibase-1+i)
+         if(k .eq. 13) then
+            call rem(out(1),ii)
+            ii = 0
+         else
+            if(ii .eq. 78) then
+               out(79)='!'
+               call rem(out(1),79)
+               ii = 0
+            endif
+            ii = ii + 1
+            out(ii) = char(k)
+         endif
+23002 continue
+      if(ii.gt.0) call rem(out(1),ii)
+      return 
+  101 format(' -- built-in function --')
+      end
+      subroutine eatup
+cProlog
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+      integer gtok
+      external gtok
+      integer t, needlog
+      needlog = 0
+c -- for(t = gtok(token,ltoken), t <> 13 , t = gtok(token,ltoken))
+      t = gtok(token,ltoken)
+      go to 23000
+23001 continue
+         t = gtok(token,ltoken)
+23000    if(.not.( t .ne. 13 )) go to 23002
+         if( prtok(t) ) then
+            call putchr(token,ltoken)
+         elseif( t .eq. 242 ) then
+cfunction can follow a type
+            call domod(t) 
+            needlog = 1
+         elseif( t .eq. 244 ) then
+cfor end=label in open statements
+            call putqs('end') 
+         else
+            call warn('Unprintable character or misused keyword.')
+            return 
+         endif
+c -- repeat
+      go to 23001
+23002 continue
+c endfor
+      call outlin
+      if( needlog .ne. 0) call prolog
+      return 
+      end
+      subroutine eval(argstk,i,j)
+cProlog
+
+ceval --expand args i through j; evaluate builtin or push back defn
+      integer argno,argstk(30),i,j,k,m,n,t,td
+      integer lbl(5),lenlbl,nl,nat,natl
+      integer labgen
+      external labgen
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+c
+      t = argstk(i)
+      if(argstk(i+1) .eq. t ) then
+         td = 0
+      else
+         td = evalst(t)
+      endif
+c
+c select
+      i23000= td
+         go to 23000
+c -- case 200
+23002 continue
+         call dodef(argstk,i,j)
+23003    go to 23001
+c -- case 202
+23004 continue
+         call doifdf(argstk,i,j)
+23005    go to 23001
+c -- case 201
+23006 continue
+         call doif(argstk,i,j)
+23007    go to 23001
+c -- case 203
+23008 continue
+         call doerrp(argstk,i,j)
+23009    go to 23001
+c -- case 204
+23010 continue
+         call dodmp(argstk,i,j)
+23011    go to 23001
+c -- case 205
+23012 continue
+         call domath(argstk,i,j)
+23013    go to 23001
+c -- case 206
+23014 continue
+         call doimed(argstk,i,j)
+23015    go to 23001
+c -- case 245
+23016 continue
+         call doundf(argstk,i,j)
+23017    go to 23001
+c -- case 207
+23018 continue
+         call domodn(argstk,i,j)
+23019    go to 23001
+c -- case (default)
+23020 continue
+
+c do replacement on text
+c first scan for how many @n's needed
+         nat = 0
+         do 23021 k=t,argstk(i+1)-2
+            if(evalst(k) .eq. 64) then
+               n = evalst(k+1) - 48
+               if(n .lt. 1 .or. n .gt. 9) then
+                  call oops( 'Bad at sign argument in macro definition.'
+     &)
+               endif
+               nat = max(nat,n)
+            endif
+23021    continue
+         if(nat .gt. 0) natl = labgen(nat)
+c now scan text backwards looking for $n, @n
+c -- for(k = argstk(i+1) - 1, k>t , k = k-1)
+         k = argstk(i+1) - 1
+         go to 23023
+23024    continue
+            k = k-1
+23023       if(.not.( k.gt.t )) go to 23025
+            if(evalst(k-1) .eq. 64) then
+               n = evalst(k) - 48
+               nl = natl + n - 1
+               call itotok(nl,lbl,lenlbl)
+               call pbstr(lbl,lenlbl)
+               k = k - 1
+            elseif(evalst(k-1) .ne. 36 ) then
+               call putbak(evalst(k))
+c $n or $* or $- or $$
+            else
+               if(evalst(k) .eq. 42) then
+c -- for(ano=j-i-1,ano>0,ano=ano-1)
+                  ano=j-i-1
+                  go to 23026
+23027             continue
+                     ano=ano-1
+23026                if(.not.(ano.gt.0)) go to 23028
+                     n = i + ano + 1
+                     m = argstk(n)
+                     ml = argstk(n+1)-argstk(n)
+                     call pbstr(evalst(m),ml)
+                     if(ano.gt.1) call pbstr(44,1)
+c -- repeat
+                  go to 23027
+23028             continue
+c endfor
+               elseif(evalst(k) .eq. 45) then
+c -- for(ano=j-i-1,ano>1,ano=ano-1)
+                  ano=j-i-1
+                  go to 23029
+23030             continue
+                     ano=ano-1
+23029                if(.not.(ano.gt.1)) go to 23031
+                     n = i + ano + 1
+                     m = argstk(n)
+                     ml = argstk(n+1)-argstk(n)
+                     call pbstr(evalst(m),ml)
+                     if(ano.gt.2) call pbstr(44,1)
+c -- repeat
+                  go to 23030
+23031             continue
+c endfor
+clook for digit
+               else
+                  ano = evalst(k) - 48
+                  if(ano .ge.0 .and. ano .le.9) then
+                     if( ano .lt. j-i) then
+                        n = i + ano + 1
+                        m = argstk(n)
+                        ml = argstk(n+1)- argstk(n)
+                        call pbstr( evalst(m),ml)
+                     endif
+c$ other, put the other
+                  else
+                     call pbstr(evalst(k),1)
+                  endif
+               endif
+cskip over $
+               k = k - 1 
+            endif
+c -- repeat
+         go to 23024
+23025    continue
+c endfor
+cdo last character
+         if(k .eq. t) call putbak(evalst(k))
+c -- dispatch area for select
+23032 go to 23001
+23000 continue
+      if( i23000 .eq. 200) go to 23002
+      if( i23000 .eq. 201) go to 23006
+      if( i23000 .eq. 202) go to 23004
+      if( i23000 .eq. 203) go to 23008
+      if( i23000 .eq. 204) go to 23010
+      if( i23000 .eq. 205) go to 23012
+      if( i23000 .eq. 206) go to 23014
+      if( i23000 .eq. 207) go to 23018
+      if( i23000 .eq. 245) go to 23016
+      go to 23020
+23001 continue
+c endselect
+      return 
+      end
+      subroutine getlev(nlev,argstk,i,j)
+cProlog
+
+c find integer after break,next statements if any
+      integer nlev,toktoi
+      integer i,j,argstk(1)
+      integer a1,a2
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+      if( j .gt. i + 2) call warn('Too many arguments to break or next')
+      a1 = argstk(i+2)
+      a2 = argstk(i+3)
+      if(a2 .gt. a1) then
+cthere is an argument
+         nlev = toktoi(evalst(a1),a2-a1) - 1
+      else
+         nlev = 0
+      endif
+      return 
+      end
+      subroutine getlin
+cProlog
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+      integer i,k
+      integer c1
+
+      integer icompile
+      common /icom/ icompile
+
+cread the next line
+csend comments out immediately
+   10 continue
+      call rdline(iusin(inlev),cbuf,lcbuf)
+      yyline(inlev) = yyline(inlev) + 1
+c####END OF FILE
+      if( lcbuf .lt. 0) go to 2000
+      if( lcbuf .eq. 0) go to 200
+      c1 = ichar(cbuf(1:1))
+calternate method for end-of-file
+      if( c1 .eq. 46) go to 2000
+c is this a comment?
+      if(col1(c1) ) then
+         pbbuf(1) = 1
+         bp = 1
+         cbuf(1:1) = 'c'
+         return 
+      endif
+      if(type(c1) .eq. 1) then
+         pbbuf(1) = 1
+         bp = 1
+         cbuf(1:1) = 'c'
+         return 
+      endif
+  200 continue
+      bp = lcbuf + 1
+      pbbuf(1) = 13
+c line goes backward into pbbuf
+      do 23000 i=1,lcbuf
+         pbbuf(bp + 1 - i) = ichar(cbuf(i:i))
+23000 continue
+c is this a continued line ?
+      if(bp .lt. 7 .or. .not.col6 ) then
+         return 
+      endif
+      if(cbuf(1:5) .eq. '     ' .and. type(pbbuf(bp-5)) .ne.131) then
+c delete the unwanted part
+         bp = bp - 5
+         pbbuf(bp) = 0
+      endif
+      return 
+c end-of-file
+ 2000 continue
+      if(iusin(inlev) .ne. 5) call fclose(iusin(inlev))
+      inlev = inlev - 1
+      if(inlev .gt. 0) then
+cback to previous file
+         bp = pblinl(inlev)
+         do 23002 i=1,bp
+            pbbuf(i) = pblins(i,inlev)
+23002    continue
+         if(pbbuf(1) .eq. 1) then
+            cbuf = cbsav(inlev)
+            lcbuf = lcsav(inlev)
+         endif
+      else
+         bp = 1
+         pbbuf(bp) = 28
+      endif
+      return 
+      end
+      function gettok(token,toksiz)
+cProlog
+
+c return next token, length of which is toksiz
+c on NEWLINE, check for following NULL which means line is continued
+c             check if last non-white token indicates continuation
+      integer gettok
+      integer toksiz
+      integer token(1)
+      integer i,j,n
+      integer toktoi
+      character*80 msg
+      external toktoi
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      character qte
+c look at next character first
+c gettok is the only routine allowed to take anything OUT of pbbuf
+  300 continue
+      if(bp .eq. 0) call getlin
+      token(1) = pbbuf(bp)
+      gettok = type(token(1))
+      if(gettok .eq. 28) then
+         return 
+      endif
+      bp = bp - 1
+      toksiz = 1
+c pbbuf has only a NEWLINE, EOF, or COMMENT in position 1
+c in the case of COMMENT, the text is still in cbuf
+c a newline might not count if the following character is NULL
+c ALPHAS, DIGITS can not be broken over continued lines
+      go to (1,2,3,4,5,6,7,8),tokgo(gettok)
+c NEWLINE
+    2 if(bp .gt.0 ) then
+         return 
+      endif
+c check ahead for possible continuation
+      call getlin
+      if(pbbuf(bp) .eq. 0) then
+         bp = bp - 1
+         go to 300
+      endif
+      if(lnbt .eq. 1 .and. pbbuf(bp) .ne. 28) go to 300
+      lnbt = 0
+      return 
+c LETTER
+    3 do 23000 i=bp,1,-1
+         if( alphan(pbbuf(i)) .eq. 0) go to 23001
+23000 continue
+23001 continue
+      do 23002 j=bp,i+1,-1
+         token(2+bp-j) = pbbuf(j)
+23002 continue
+      toksiz = 1 + bp - i
+      bp = i
+      gettok = 130
+      lnbt = 0
+      return 
+c QUOTE
+    4 i = bp
+  500 continue
+      if(i .eq. 1) then
+cat end of line, check for continuation
+         do 23004 j=bp,2,-1
+            token(toksiz+bp+1-j) = pbbuf(j)
+23004    continue
+         toksiz = toksiz + bp - 1
+         call getlin
+         if(pbbuf(bp) .eq. 0) then
+            bp = bp -1
+            i = bp
+            go to 500
+         endif
+         qte=char(token(1))
+         call inform('Missing quote ('//qte//')')
+         lnbt = 0
+         call putbak(13)
+         return 
+      endif
+      if( pbbuf(i) .eq. token(1) ) then
+c probably the end but watch out for doubled quote
+         if(pbbuf(i-1) .ne. token(1)) go to 501
+         i = i - 1
+      endif
+      i = i - 1
+      go to 500
+  501 continue
+      do 23006 j=bp,i,-1
+         token(toksiz+bp+1-j) = pbbuf(j)
+23006 continue
+      toksiz = toksiz + 1 + bp - i
+      bp = i - 1
+      lnbt = 0
+      return 
+c WHITE
+    5 do 23008 i=bp,1,-1
+         if( type(pbbuf(i)) .ne. 131 ) go to 23009
+23008 continue
+23009 continue
+      token(1) = 32
+      bp = i
+cavoid setting lnbt on white
+      return 
+c DIGIT
+    6 do 23010 i=bp,1,-1
+         if( type(pbbuf(i)) .ne. 129 ) go to 23011
+23010 continue
+23011 continue
+      do 23012 j=bp,i+1,-1
+         token(2+bp-j) = pbbuf(j)
+23012 continue
+      toksiz = 1 + bp-i
+      bp = i
+c peek ahead for Hollerith
+      if(pbbuf(bp) .eq. 72 .or. pbbuf(bp) .eq. 104) then
+         if(toksiz .gt. 2) call oops('Hollerith count too large.')
+         n = toktoi(token,toksiz)
+         if( n .ge. bp - 1) call oops('Hollerith constant error.')
+         toksiz = toksiz + 1
+         token(toksiz) = pbbuf(bp)
+         do 23014 i = 1, n
+            token(toksiz+i) = pbbuf(bp - i)
+23014    continue
+         toksiz = toksiz+n
+         gettok = 34
+         bp = bp - (n+1)
+      endif
+      lnbt = 0
+      return 
+c COMMENT
+    7 if(bp .eq. 0) then
+cwhole line a comment
+         if(bckeep) call wrline(iusout,cbuf,lcbuf)
+         go to 300
+      endif
+c c
+      token(1) = 99 
+      do 23016 j=bp,2,-1
+         if(pbbuf(j) .eq. 13) go to 23017
+23016 continue
+23017 continue
+      if( bckeep ) then
+         toksiz = bp - j + 1
+         do 23018 i = bp, j+1, -1
+            token(2 + bp - i) = pbbuf(i)
+23018    continue
+         call zpakchrz(msg,token,toksiz)
+         call wrline(iusout,msg,toksiz)
+      endif
+      bp = j
+      go to 300
+    8 lnbt = 1
+      go to 300
+c remark: otherwise is a single letter token, returns as itself
+    1 lnbt = contu(gettok)
+      return 
+      end
+      function gnbtok(token,ltoken)
+cProlog
+
+      integer gnbtok,token(1),ltoken
+      integer gtok
+      external gtok
+      gnbtok = gtok(token,ltoken)
+      if(gnbtok .eq. 131) gnbtok = gtok(token,ltoken)
+      return 
+      end
+      function gtok(token,ltoken)
+cProlog
+
+      integer gtok
+      integer token(1),ltoken
+      integer lookup,gettok,peek
+      external lookup,gettok,peek
+      integer t
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+cuses yyline
+
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+
+      integer ap,argstk(30),callst(30),nlb,plev(30)
+      common /cargs/ ap,argstk,callst,nlb,plev
+
+c return with next token after resolving macro definitions
+c -- for(t=gettok(token,ltoken), t <> 28 , t=gettok(token,ltoken))
+      t=gettok(token,ltoken)
+      go to 23000
+23001 continue
+         t=gettok(token,ltoken)
+23000    if(.not.( t .ne. 28 )) go to 23002
+c if token is alphanumeric, see if it is a macro and expand it if
+c we are not inside square brackets
+         if(t .eq. 130 ) then
+cno lookup if inside brackets
+            if(nlb .gt. 0) go to 100 
+            jdef = lookup(token,ltoken)
+            if(jdef .eq. 0) go to 100
+c token is a macro ; set up stack frame
+            cp = cp + 1
+            if(cp .gt. 30) then
+               cp = 30
+               call oops('Macro error, call stack overflow.')
+            endif
+            mline(cp) = yyline(inlev)
+            mlev(cp) = inlev
+            callst(cp) = ap
+cstart stack frame
+            call push(ep,argstk,ap)
+cstack definition
+            call putdef(jdef)
+            call push(ep,argstk,ap)
+cstack name
+            call putarg(token,ltoken)
+            call push(ep,argstk,ap)
+cadd parenthesis if they are not already on the way
+c peek returns YES if next non-blank character matches its argument
+            t = peek(40)
+            if(t .eq. 0) then
+cpush back parens
+               call putbak(41)
+               call putbak(40)
+            else
+c while(t <> 40)
+23003          if(t .ne. 40)  then
+                  t=gettok(token,ltoken)
+                  go to 23003
+               endif
+c endwhile
+               call putbak(40)
+            endif
+            plev(cp) = 0
+c start collecting arguments
+            go to 23001
+         elseif(t.eq.91) then
+            nlb = nlb + 1
+cstrip one level of []
+            if(nlb .eq. 1) go to 23001
+         elseif(t.eq.93) then
+            nlb = nlb - 1
+            if(nlb .lt. 0) then
+               call inform('Extraneous right square bracket.')
+               nlb = 0
+            endif
+            if(nlb .eq. 0) go to 23001
+         endif
+  100    continue
+c not in a macro, this is the token we want
+         if(cp .eq. 0) then
+            gtok                             = (t)
+            return
+         endif
+c if inside square brackets just copy token
+         if(nlb .gt. 0) then
+            call putarg(token,ltoken)
+c argument collection, look for commas, but not inside parens
+         elseif(t.eq.40) then
+            if(plev(cp) .gt. 0) call putarg(token,ltoken)
+            plev(cp) = plev(cp) + 1
+         elseif(t.eq.41) then
+            plev(cp) = plev(cp) - 1
+            if(plev(cp) .gt. 0 ) then
+               call putarg(token,ltoken)
+cend of argument list found !
+            else
+c evaluate the macro and its arguments
+               argstk(ap) = ep
+               call eval(argstk,callst(cp),ap-1)
+cpop evaluation stack
+               ap = callst(cp)
+               ep = argstk(ap)
+               cp = cp - 1
+            endif
+         elseif(t .eq. 44 .and. plev(cp) .eq. 1) then
+cnew arg
+            call push(ep,argstk,ap)
+         else
+cjust stack it
+            call putarg(token,ltoken) 
+         endif
+c -- repeat
+      go to 23001
+c end of gettok call loop
+23002 continue
+c endfor
+c arrive here if end-of-file, check for screwed up [] or parens
+      if(cp .ne. 0 ) call oops( 
+     &'Unexpected end of file in macro arguments--missing ) or ] ?')
+      if(nlb .gt. 0) call oops(
+     &'Missing right square bracket, at end-of-file.')
+      gtok                             = (28)
+      return
+      end
+      function icomp(n1,ln1,n2,ln2)
+cProlog
+
+c return -, 0 or + depending on comparison of n1, n2
+c second version, sort by length, then by alpha
+      integer n1(1),ln1,n2(1),ln2
+      integer i,icomp
+      icomp = ln1 - ln2
+      if(icomp .ne. 0) then
+         return 
+      endif
+      do 23000 i=1,ln1
+         icomp = n1(i) - n2(i)
+         if(icomp .ne. 0) then
+            return 
+         endif
+23000 continue
+      return 
+      end
+      subroutine init
+cProlog
+
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      integer i
+c type table and switch tables
+      do 23000 i=0,255
+         type(i) = i
+         alphan(i) = 0
+         contu(i) = 0
+         tokgo(i) = 1
+         decide(i) = 1
+         prtok(i) = .false.
+         col1(i) = .false.
+23000 continue
+      do 23002 i=48,57
+         type(i) = 129
+         alphan(i) = 1
+23002 continue
+      do 23004 i=65,90
+         type(i) = 128
+         alphan(i) = 1
+23004 continue
+      do 23006 i=97,122
+         type(i) = 128
+         alphan(i) = 1
+23006 continue
+      type(32) = 131
+      type(9) = 131
+      type(95) = 128
+      type(59) = 13
+      type(39) = 34
+      type(33) = 1
+      type(35) = 1
+      tokgo(13)=2
+      tokgo(128)=3
+      tokgo(34)=4
+      tokgo(131)=5
+      tokgo(129)=6
+      tokgo(1)=7
+      tokgo(92)=8
+      decide(211)=2
+      decide(208)=3
+      decide(210)=4
+      decide(209)=5
+      decide(213)=6
+      decide(212)=7
+      decide(214)=8
+      decide(215) = 9
+      decide(218) = 10
+      decide(216) = 11
+      decide(217) = 12
+      decide(241)=13
+      decide(240)=13
+      decide(242)=13
+      decide(244)=14
+      decide(243)=15
+      decide(226)=16
+      decide(13)=17
+      decide(224)=18
+      decide(225)=19
+      decide(220)=20
+      decide(221)=21
+      decide(222)=21
+      decide(223)=22
+      decide(246)=23
+      alphan(95) = 1
+c characters which cause a line to be continued
+      contu(43) = 1
+      contu(45) = 1
+      contu(42) = 1
+c can't do it on SLASH because of data statement
+      contu(40) = 1
+      contu(92) = 1
+      contu(61) = 1
+      contu(44) = 1
+      contu(124) = 1
+      contu(38) = 1
+      contu(126) = 1
+      contu(60) = 1
+      contu(62) = 1
+c characters which are a comment in column 1
+      col1(99) = .true.
+      col1(67) = .true.
+      col1(42) = .true.
+c column 6 continuation conventions
+      col6 = .true.
+c put out blank lines and comment lines if bckeep is true
+      bckeep = .true.
+c characters which are printable
+      do 23008 i=32,126
+         prtok(i) = .true.
+23008 continue
+      prtok(7) = .true.
+      prtok(9) = .true.
+      prtok(131) = .true.
+      prtok(130) = .true.
+      prtok(129) = .true.
+      return 
+      end
+      subroutine initio(fil)
+cProlog
+
+      character*(*) fil
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      character*80 filfix
+      character*200 inlin
+      integer cinlin
+c initialize input and output buffers
+      inlev = 1
+      filnam(inlev) = fil
+      call setmod(63,1)
+      modfun = 0
+      yyline(inlev) = 0
+coutput line empty
+      lastpc = 0 
+cpush back buffer empty
+      bp = 0 
+   10 continue
+
+
+
+      if( filnam(inlev) .eq. '__tty__') then
+         iusin(inlev) = 5
+         call howend
+         call mprompt('mppl> ',5)
+      else
+         iusin(inlev) = 8
+         call fopen(iusin(inlev),filnam(inlev),ierr)
+         if(ierr .ne. 0 ) go to 200
+      endif
+      return 
+  200 continue
+      write(0,100) filnam(inlev)
+  100 format('  Could not open input file ',a)
+      call oops('  ******** Terminating **********')
+      end
+      subroutine instal(n,lname0,defn,ldefn)
+cProlog
+
+cinstall a name and defn, which are in integer form
+      integer defn(1),n(1)
+      integer ldefn,lname0,lname,i,ilo,ihi
+      integer ic,nptr
+      integer lookup
+      external lookup
+      integer name(10000)
+      character*50 badnam
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+c
+      lname = lname0
+      if(lastt + ldefn + lname .gt. 125000 .or. ptop.eq.0) then
+         call oops('Too many definitions -- macro table full.')
+      endif
+c check for improper characters, etc.
+c trying to redefine something often gets caught here
+      do 23000 ilo= 1,lname
+         if( type(n(ilo)) .ne. 131) go to 23001
+23000 continue
+23001 continue
+      do 23002 ihi = lname,1,-1
+         if( type(n(ihi)) .ne. 131) go to 23003
+23002 continue
+23003 continue
+      if( ilo .gt. ihi ) call oops('empty name in definition')
+      do 23004 i=ilo,ihi
+         if(alphan(n(i)) .ne. 1) call oops(
+     &' Name not alphanumeric in definition')
+         if(defupcas .eq. 1 .and. (n(i) .ge.97 .and. n(i) .le.122)) then
+            name(i) = n(i) - 32
+         else
+            name(i) = n(i)
+         endif
+23004 continue
+      lname = ihi + 1 - ilo
+      if(lookup(name(ilo),lname) .ne. 0) call unstal(name(ilo),lname)
+      call newptr(nptr)
+c install the definition
+
+      deflen(nptr) = ldefn
+      namlen(nptr) = lname
+c
+      namptr(nptr) = lastt + 1
+      do 23006 i=1,lname
+         table(lastt + i) = name(ilo -1 + i)
+23006 continue
+      lastt = lastt + lname
+c
+      defptr(nptr) = lastt + 1
+      do 23008 i=1,ldefn
+         table(lastt + i) = defn(i)
+23008 continue
+      lastt = lastt + ldefn
+c add to hash table
+      nextdef(nptr) = 0
+      k = namptr(nptr)
+      j = 0
+      do 23010 i=1,namlen(nptr)
+         j = j + table(k-1+i)
+23010 continue
+      j = mod(j,501)
+      knext = hshtab(j)
+      if(knext .eq. 0) then
+         hshtab(j) = nptr
+         return 
+      endif
+ 1000 continue
+      k = knext
+      knext = nextdef(k)
+      if(knext .gt. 0) go to 1000
+c
+      nextdef(k) = nptr
+      return 
+      end
+      subroutine doundf(argstk,i,j)
+cProlog
+
+c take definition out of table
+      integer a1,a2,argstk(1),i,j
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+      if(j .ne. i+2) call oops('wrong number of arguments in undefine')
+      a1=argstk(i+2)
+      a2=argstk(i+3)
+      if(a1.ne.a2) call unstal(evalst(a1),a2-a1)
+      return 
+      end
+      subroutine domodn(argstk,i,j)
+cProlog
+
+      integer i, j, argstk(1)
+c return the current value of modnam
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      call pbstr(modnam,32)
+      return 
+      end
+      subroutine unstal(name,lname0)
+cProlog
+
+c remove a definition from macro table
+c input
+c length of def. name
+c delimits actual def. name
+c ptr to def. to be removed
+c old pointer
+      integer name(1),lname0,  lname,  ilo,ihi,  unptr,  old,  newin,
+c new and old index to table
+c used-stack pointer
+c ptr to current and next def.
+c stop condition, temp. var.
+     &oldin,  usptr,  np,cp,  stop,temp 
+      integer lookup
+      external lookup
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+      lname=lname0
+      ilo=1
+c while(type(name(ilo))==131)
+23000 if(type(name(ilo)).eq.131)  then
+         ilo=ilo-1
+         go to 23000
+      endif
+c endwhile
+      ihi=lname
+c while(type(name(ihi))==131)
+23002 if(type(name(ihi)).eq.131)  then
+         ihi=ihi-1
+         go to 23002
+      endif
+c endwhile
+c if there's no def. name
+      if(ilo.gt.ihi) call oops('unstal:empty definition name')
+c if the def. name is invalid
+      do 23004 i=ilo,ihi
+         if(alphan(name(i)).ne. 1) call oops(
+     &'unstal:definition not alphanumeric')
+23004 continue
+      lname=ihi+1-ilo
+c get pointer to def. name to be removed
+      unptr=lookup(name(ilo),lname)
+c if it doesn't exist
+      if(unptr .eq. 0) then
+         call warn('unstal:undefined definition')
+      else
+c remove the definition
+c change nextdef
+         j =0
+         do 23006 i=ilo,ihi
+            j = j + name(i)
+23006    continue
+         j = mod(j,501)
+         if(hshtab(j) .eq. unptr) then
+            hshtab(j) = nextdef(unptr)
+            nextdef(unptr) = 0
+         else
+            old=hshtab(j)
+c while(nextdef(old)<>unptr)
+23008       if(nextdef(old).ne.unptr)  then
+               old=nextdef(old)
+               go to 23008
+            endif
+c endwhile
+            temp=nextdef(old)
+            nextdef(old)=nextdef(temp)
+            nextdef(temp) = 0
+         endif
+c change table and pointers to table
+c first, find index to table of def to be removed and
+c following def.
+         usptr=1
+c while(usptr<lastp & ustck(usptr)<>unptr)
+23010    if(usptr.lt.lastp .and. ustck(usptr).ne.unptr)  then
+            usptr=usptr+1
+            go to 23010
+         endif
+c endwhile
+         oldin=namptr(unptr)
+         newin=namptr(unptr)+namlen(unptr)+deflen(unptr)
+         old=oldin
+c move everything to the left
+c while(newin<=lastt)
+23012    if(newin.le.lastt)  then
+            cp=ustck(usptr)
+            np=ustck(usptr+1)
+            stop=newin+namlen(np)+deflen(np)
+c while(newin<stop & newin<125000)
+23014       if(newin.lt.stop .and. newin.lt.125000)  then
+               table(oldin)=table(newin)
+               oldin=oldin+1
+               newin=newin+1
+               go to 23014
+            endif
+c endwhile
+            namptr(np)= old
+            defptr(np)=namptr(np)+namlen(np)
+            old=defptr(np)+deflen(np)
+            usptr=usptr+1
+            go to 23012
+         endif
+c endwhile
+         lastt=oldin-1
+c set unptr array locations to 0
+         namlen(unptr)=0
+         deflen(unptr)=0
+         namptr(unptr)=0
+         defptr(unptr)=0
+c retrun old pointer to stack
+         call oldptr(unptr)
+      endif
+      return 
+      end
+      subroutine newptr(x)
+cProlog
+
+c returns a new pointer for macro table
+c new pointer
+      integer x 
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+c if someone changed the stack tops
+      if((ptop+lastp).ne.5000) call oops('newptr:stack top tampering')
+c if there is a pointer available
+      if(ptop.gt.0) then
+         x=pstck(ptop)
+         ptop=ptop-1
+         lastp= lastp +1
+         ustck(lastp)=x
+      else
+         call oops('no pointers left-macro table full')
+      endif
+      return 
+      end
+      subroutine oldptr(ptr)
+cProlog
+
+c returns a used pointer to available stack
+c pointer to be removed
+c loop counters
+c result of validp
+      integer ptr,  i,j,  val 
+      integer validp
+      external validp
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+c if someone changed the stack tops
+      if((ptop+lastp).ne.5000) call oops('oldptr:stack top tampering')
+c if it's a valid pointer
+      val =validp(ptr)
+      if(val .le. 1) then
+         ptop=ptop+1
+         pstck(ptop)=ptr
+         i=1
+c while(ptr <> ustck(i) & i<=lastp)
+23000    if(ptr .ne. ustck(i) .and. i.le.lastp)  then
+            i = i + 1
+            go to 23000
+         endif
+c endwhile
+         if(lastp.gt.i) then
+            do 23002 j=i,lastp-1
+               ustck(j)=ustck(j+1)
+23002       continue
+         endif
+         lastp=lastp-1
+         if(val .eq. 0) nbuilt=nbuilt-1
+      else
+         call oops('oldptr:attempt to return unused pointer')
+      endif
+      return 
+      end
+      function validp(p)
+cProlog
+
+c returns 0 if pointer is a builtin,
+c         1 if it is currently being used, but is not a builtin
+c         2 otherwise
+      integer validp,i,p
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+      if(p.le.0) then
+         validp                           = (2)
+         return
+      endif
+      do 23000 i=1,lastp
+         if(ustck(i) .eq. p) then
+            if(i.le.nbuilt) then
+               validp                           = (0)
+               return
+            else
+               validp                           = (1)
+               return
+            endif
+         endif
+23000 continue
+      validp                           = (2)
+      return
+      end
+      subroutine itotok(n,token,ltoken)
+cProlog
+
+c convert n into a string in token, length to ltoken
+      integer n,token(1),ltoken
+      character*16 target
+      integer i,j
+      if(n .eq. 0) then
+         ltoken = 1
+         token(1) = 48
+         return 
+      endif
+      write(target,100) n
+  100 format(i16)
+      do 23000 i=1,16
+         if( target(i:i) .ne. ' ') go to 23001
+23000 continue
+23001 continue
+      i = i - 1
+      ltoken = 16 - i
+      do 23002 j = 1, ltoken
+         token(j) = ichar(target(i+j:i+j))
+23002 continue
+      return 
+      end
+      function labgen(n)
+cProlog
+
+      integer labgen,n
+
+      integer labnxt,laborg
+      common /labg/labnxt,laborg
+
+      labgen = labnxt
+      labnxt = labnxt + n
+      return 
+      end
+      subroutine reset
+cProlog
+
+
+      integer labnxt,laborg
+      common /labg/labnxt,laborg
+
+      labnxt = laborg
+      return 
+      end
+      subroutine setmod(name,lname)
+cProlog
+
+      integer name(1),lname,i,j
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      do 23000 i=1,lname
+         modnam(i) = name(i)
+23000 continue
+      do 23002 i = lname+1,32
+         modnam(i)=32
+23002 continue
+      do 23004 i=1,32
+         j = modnam(i)
+         modnac(i:i) = char(j)
+23004 continue
+      return 
+      end
+      subroutine setorg(n)
+cProlog
+
+      integer n
+
+      integer labnxt,laborg
+      common /labg/labnxt,laborg
+
+      laborg = n
+      return 
+      end
+      function lookup(name,lname)
+cProlog
+
+c returns index in table of start of definition for name
+c returns 0 if not found
+      integer name(1)
+      integer lname, n(10000)
+      integer lookup
+      integer icomp
+      integer j,k
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+c
+c convert to all upper case if -u flag is YES
+      do 23000 i=1,lname
+         if( defupcas .eq. 1 .and.(name(i) .ge.97 .and. name(i) .le.122)
+     &) then
+            n(i) = name(i) - 32
+         else
+            n(i) = name(i)
+         endif
+23000 continue
+c
+      j = 0
+      do 23002 i=1,lname
+         j = j + n(i)
+23002 continue
+      j = mod(j,501)
+c -- for(lookup = hshtab(j) , lookup <> 0 , lookup = nextdef(lookup))
+      lookup = hshtab(j) 
+      go to 23004
+23005 continue
+         lookup = nextdef(lookup)
+23004    if(.not.( lookup .ne. 0 )) go to 23006
+         if(icomp(n,lname,table(namptr(lookup)),namlen(lookup)) .eq. 0) 
+     &then
+            return 
+         endif
+c -- repeat
+      go to 23005
+23006 continue
+c endfor
+      return 
+      end
+      subroutine oops(msg)
+cProlog
+
+      character*(*) msg
+      call warn(msg)
+      call finish(2)
+      end
+      subroutine warn(msg)
+cProlog
+
+      character*(*) msg
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      call inform(msg)
+c attempt to recover to next line
+      call outlin
+      bp = 1
+      return 
+      end
+      subroutine inform(msg)
+cProlog
+
+      character*(*) msg
+      integer igoof,ilev,jlev,a1,a2,i,j,il
+      character*56 mname
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+
+      integer ap,argstk(30),callst(30),nlb,plev(30)
+      common /cargs/ ap,argstk,callst,nlb,plev
+
+
+      integer finerr
+      common /cerr/ finerr
+
+      finerr = 1
+      write(0,90) modnac,msg
+      ilev = inlev
+      if(pbbuf(bp) .eq. 28) ilev = ilev + 1
+      jlev = ilev
+c while(ilev > 0)
+23000 if(ilev .gt. 0)  then
+         igoof = yyline(ilev)
+c -- for(il = 1, filnam(ilev)(il:il) <> ' ', il=il+1)
+         il = 1
+         go to 23002
+23003    continue
+            il=il+1
+23002       if(.not.( filnam(ilev)(il:il) .ne. ' ')) go to 23004
+            if(il .eq. len(filnam(ilev))) go to 23004
+c -- repeat
+         go to 23003
+23004    continue
+c endfor
+         if(ilev .eq. jlev) then
+            write(0,100) igoof,filnam(ilev)(1:il)
+            do 23005 ip = 1,cp
+               a1 = argstk(callst(ip)+1)
+               a2 = argstk(callst(ip)+2) - 1
+               jl = min(a2-a1+1,56)
+               do 23007 j=1,jl
+                  mname(j:j)=char(evalst(a1-1+j))
+23007          continue
+               if(ip .eq. 1) then
+                  write(0,103)  mname(1:jl),mline(ip),filnam(mlev(ip))
+               else
+                  write(0,104)  mname(1:jl),mline(ip),filnam(mlev(ip))
+               endif
+23005       continue
+         else
+            write(0,101) igoof-1,filnam(ilev)(1:il)
+         endif
+         ilev = ilev - 1
+         go to 23000
+      endif
+c endwhile
+      call outlin
+      write(iusout,102) msg
+      return 
+   90 format(' mppl error : module = ',a/1x,a)
+  100 format(' Near line no. ',i5,' in file ',a)
+  101 format(' (Included from line no. ',i5,' in file ',a,')')
+  102 format(' ****** mppl error *****'/a)
+  103 format(' ERROR OCCURRED DURING MACRO/KEYWORD PROCESSING:'/ 
+     &' Error in  ',a,' which began on line ',i5,' of file ',a)
+  104 format(' which called  ',a,' on line ',i5,' of file ',a)
+      end
+      subroutine outcnt(n)
+cProlog
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+c put out the statement 'n continue'
+      if( lastpc .gt. 0) then
+         call inform('Label not permitted on this kind of statement.')
+      endif
+      call puti5(n)
+      call outtab
+      call putqs('continue')
+      call outlin
+      return 
+      end
+      subroutine outgo(n)
+cProlog
+
+c put the statment 'go to n' into the output buffer, call outlin
+c
+      call putqs('go to ')
+      call puti5(n)
+      call outlin
+      return 
+      end
+      subroutine outifl
+cProlog
+
+c if a label is already present, output a continue on it
+c otherwise do nothing
+c used to handle labels on statements that generate their own label
+c like while, block do
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      if(lastpc .eq. 0) then
+         return 
+      endif
+      call outtab
+      call putqs('continue')
+      call outlin
+      return 
+      end
+      subroutine outlin
+cProlog
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      character*150 msg
+c outputs one line
+      call zpakchrz(msg,outbuf,lastpc)
+      call wrline(iusout,msg,lastpc)
+      lastpc = 0
+      return 
+      end
+      subroutine outtab
+cProlog
+
+c get past statement field
+c if already there, do nothing
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      integer newpc
+      if(lastpc .gt. 5) then
+         return 
+      endif
+      newpc=6+(iflevel + level + sellev)*3
+      do 23000 i=lastpc+1,newpc
+         outbuf(i) = 32
+23000 continue
+      lastpc = newpc
+      return 
+      end
+      subroutine pbstr(in,n)
+cProlog
+
+c push back in
+      integer in(1)
+      integer n
+      integer i,bpnew
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      bpnew = bp + n
+      if(bpnew .gt. 10000) call oops('Macro processor error in pbstr:'//
+     & ' too many characters pushed back')
+      do 23000 i = 1, n
+         pbbuf(bp + i) = in(n + 1 - i)
+23000 continue
+      bp = bpnew
+      return 
+      end
+      function peek(c)
+cProlog
+
+c return YES if next non-blank is c, NO otherwise
+c only checks in this line
+      integer c,peek
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      integer i
+      do 23000 i=bp,2,-1
+         if(type(pbbuf(i)) .ne. 131) go to 23001
+23000 continue
+23001 continue
+      if(pbbuf(i) .eq. c) then
+         peek                             = (1)
+         return
+      endif
+      peek                             = (0)
+      return
+      end
+      subroutine prolog
+cProlog
+
+c insert a statement Prolog after each module card
+      call putbak(13)
+      call cpbstr('      Prolog')
+      return 
+      end
+      subroutine push(ep,argstk,ap)
+cProlog
+
+      integer ep,argstk(30),ap
+
+      if(ap .ge. 30) call oops(
+     &'Macro processor error: argument stack overflow.')
+      argstk(ap) = ep
+      ap = ap + 1
+      end
+      subroutine putarg(cout,n)
+cProlog
+
+      integer i,n
+      integer cout(1)
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+      if(ep + n .gt. 10000) call oops(
+     &'Macro processor error: evaluation stack overflow.')
+      do 23000 i=1,n
+         evalst(ep - 1 + i ) = cout(i)
+23000 continue
+      ep = ep + n
+      return 
+      end
+      subroutine putbak(c)
+cProlog
+
+      integer c
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      bp = bp + 1
+      if(bp .gt. 10000) call oops('Macro processor error: '// 
+     &'too many characters pushed back.')
+      pbbuf(bp) = c
+      return 
+      end
+      subroutine putchr(cout,n)
+cProlog
+
+      integer i,n
+      integer cout(1)
+      character*80 msg
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      if( lastpc + n .le. col72 ) then
+         do 23000 i=1,n
+            outbuf(lastpc + i) = cout(i)
+23000    continue
+         lastpc = lastpc + n
+         return 
+      endif
+c doesn't fit
+c blast out existing line, set up for continuation
+      call zpakchrz(msg,outbuf,lastpc)
+      call wrline(iusout,msg,lastpc)
+      do 23002 i=1,5
+         outbuf(i) = 32
+23002 continue
+      outbuf(6) = 38
+      lastpc = 6
+c watch out for extremely long tokens
+      nc = 0
+23004 continue
+         if( lastpc + n - nc .le. col72) then
+            do 23006 i=1,n-nc
+               outbuf(lastpc + i) = cout(nc + i)
+23006       continue
+            lastpc = lastpc + n - nc
+            return 
+         endif
+         idone = col72 - lastpc
+         do 23008 i=1,idone
+            outbuf(lastpc + i) = cout(nc + i)
+23008    continue
+         call zpakchrz(msg,outbuf,col72)
+         call wrline(iusout,msg,col72)
+         lastpc = 6
+         nc = nc + idone
+c -- repeat
+      go to 23004
+      end
+      subroutine putdef(jdef)
+cProlog
+
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+c put definition from table onto evalst
+      integer epnew,nt
+c
+      n = deflen(jdef)
+      nt = defptr(jdef)
+      epnew = ep + n
+      if(epnew .gt. 10000) call oops(
+     &'Macro processor error: evaluation stack overflow.')
+      do 23000 i=0,n-1
+         evalst(ep + i ) = table(nt + i)
+23000 continue
+      ep = epnew
+      return 
+      end
+      subroutine puti5(n)
+cProlog
+
+c adds the character representation of n to the current output line
+c used only for label fields...right adjust in 5 characters
+      integer n
+      integer lb(5)
+      m = n
+      lb(5) = mod(m,10) + 48
+      m = m/10
+      do 23000 i=4,1,-1
+         if( m .eq. 0) then
+            lb(i) = 32
+         else
+            lb(i) = mod(m,10 ) + 48
+            m = m/10
+         endif
+23000 continue
+      call putchr(lb,5)
+      return 
+      end
+      subroutine putlab(token,ltoken)
+cProlog
+
+      integer token(1),ltoken
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      do 23000 i=1,ltoken
+         outbuf(i) = token(i)
+23000 continue
+      do 23002 i=ltoken+1,6
+         outbuf(i) = 32
+23002 continue
+      lastpc = 6
+      return 
+      end
+      subroutine putqs(str)
+cProlog
+
+      character*(*) str
+      integer i,n
+      integer qs(80)
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      n = len(str)
+      do 23000 i=1,n
+         qs(i) = ichar(str(i:i))
+23000 continue
+      call putchr(qs,n)
+      return 
+      end
+      subroutine sbrk
+cProlog
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      integer t,gnbtok,toktoi
+      external gnbtok,toktoi
+      integer nlev
+c look for digit after the next
+      t = gnbtok(token,ltoken)
+      if( t .eq. 129) then
+         nlev = toktoi(token,ltoken) - 1
+         t = gnbtok(token,ltoken)
+      else
+         nlev = 0
+      endif
+c shouldn't be anything else here
+      if( t .ne. 13) then
+         call warn('Illegal syntax in -break- statement.')
+         return 
+      elseif(level-nlev .le. 0) then
+         call warn('Illegal -break- statement, level wrong')
+         return 
+      endif
+      call outtab
+      call outgo(labb(level-nlev))
+      used(level-nlev) = 1
+      return 
+      end
+      subroutine sdo
+cProlog
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      integer labgen,gnbtok,toktoi
+      external labgen,gnbtok,toktoi
+      integer t
+c expand a do statement -- statement might have a label
+c peek ahead
+      t = gnbtok(token,ltoken)
+      if(t .eq. 129) then
+cOld style, user supplied label for the end
+c get past statement field
+         call outtab 
+cput out 'do '
+         call putqs('do ') 
+         level = level + 1
+         dotype(level) = 1
+         labb(level) = labgen(1)
+         labn(level) = toktoi(token,ltoken)
+         call putchr(token,ltoken)
+         call eatup
+         used(level) = 0
+      elseif(t .eq. 13) then
+         call outifl
+         n = labgen(1)
+ctarget for repeat, until
+         call outcnt(n) 
+         level = level + 1
+         dotype(level) = 3
+         labn(level) = n
+         labb(level) = labgen(1)
+         used(level) = 0
+c new style do var=... or do for var=...
+      else
+         if( t .eq. 224) then
+            t=gnbtok(token,ltoken)
+         endif
+         call outtab
+cput out 'do '
+         call putqs('do ') 
+         level = level + 1
+         dotype(level) = 2
+         labn(level) = labgen(1)
+         labb(level) = labgen(1)
+         used(level) = 0
+         call puti5(labn(level))
+         call putchr(32,1)
+         call putchr(token,ltoken)
+         call eatup
+      endif
+      return 
+      end
+      subroutine sedo
+cProlog
+
+c process enddo or labeled target of traditional do
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      integer t,gnbtok
+      external gnbtok
+      integer it,nlev
+      if(level .eq. 0) then
+         call warn('Unmatched end of do block.')
+         return 
+      endif
+      it = dotype(level)
+      if(it .eq. 2) then
+         call outifl
+         level = level - 1
+         call outcnt(labn(level+1))
+         if(used(level+1) .eq. 1) call outcnt(labb(level+1))
+         call spit
+      elseif(it .eq. 1) then
+c dofile has just processed the labeled statement on a traditional do
+c put out the continue statements for breaks
+c have to watch out for the case of multiple old-style dos with the
+c SAME target  i.e. do 200 i= 1,100 ; do 200 j=1,100 ; .... 200 continue
+csave level for later use
+         nlev = level 
+         lab = labn(level)
+         level = level - 1
+c get the new level of indentation
+c while(labn(level) == lab)
+23000    if(labn(level) .eq. lab)  then
+cthis is sure to stop (labn(0)=0)
+            level = level - 1
+            go to 23000
+         endif
+c endwhile
+         do 23002 i=nlev,level+1,-1
+            if(used(i) .eq. 1) call outcnt(labb(i))
+23002    continue
+      elseif(it .eq. 3) then
+         call outifl
+         call putqs('c -- repeat')
+         call outlin
+         level = level - 1
+         call outtab
+         call outgo(labn(level+1))
+         call spit
+         if(used(level+1) .eq. 1) call outcnt(labb(level+1))
+      elseif(it .eq. 4) then
+         call sewhile
+      endif
+      return 
+      end
+      subroutine sefor
+cProlog
+
+      call sedo
+      call putqs('c endfor')
+      call outlin
+      return 
+      end
+      subroutine selif
+cProlog
+
+c process elseif statement
+c call docond to output condition & translate logical operators
+c elseif (condition) must be followed by then; we supply even if missing
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      integer t,gnbtok,docond
+      external gnbtok,docond
+c
+      if(iflevel .eq. 0) then
+         call warn('Elseif not inside if block.')
+         return 
+      endif
+      iflevel = iflevel - 1
+      call outtab
+      call putqs('elseif')
+      if(docond() .ne. 0) then
+         return 
+      endif
+      call putqs('then')
+      call outlin
+      iflevel = iflevel + 1
+      t = gnbtok(token,ltoken)
+      if( t .eq. 13) then
+         return 
+      endif
+      if( t .eq. 219) then
+         call spit
+      else
+         call warn('Syntax error in elseif statement.')
+      endif
+      return 
+      end
+      subroutine selse
+cProlog
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      integer gnbtok
+      external gnbtok
+      integer t
+c
+      if(iflevel .eq. 0) then
+         call warn('Unmatched else.')
+         return 
+      endif
+      t = gnbtok(token,ltoken)
+c check for 'elseif' which is treated as elseif
+      if(t .eq. 215) then
+         call selif
+         return 
+      endif
+      iflevel = iflevel - 1
+      call outtab
+      call putqs('else')
+      call outlin
+      if(t .ne. 13) call warn('Syntax error in else statement')
+      iflevel = iflevel + 1
+      return 
+      end
+      subroutine sendif
+cProlog
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      if(iflevel .eq. 0) then
+         call warn('Unmatched endif.')
+         return 
+      endif
+      iflevel = iflevel - 1
+      call outtab
+      call putqs('endif')
+      call outlin
+      call spit
+      return 
+      end
+      subroutine setopt(optstr)
+cProlog
+
+      character*(*) optstr
+      integer c1,i,n
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+
+      integer icompile
+      common /icom/ icompile
+
+c is passed the option string with the leading - removed
+      c1 = ichar(optstr(1:1))
+c select
+      i23000= c1
+         go to 23000
+c -- case 48- 57
+23002 continue
+
+         n = c1 - 48
+         do 23003 i=2,len(optstr)
+            c1 = ichar(optstr(i:i))
+c select
+            i23005= c1
+               go to 23005
+c -- case 48- 57
+23007       continue
+
+               n = n*10+c1-48
+23008          go to 23006
+c -- case 32
+23009       continue
+               go to 23004
+23010          go to 23006
+c -- case (default)
+23011       continue
+               go to 900
+c -- dispatch area for select
+23012       go to 23006
+23005       continue
+            if( i23005 .eq. 32) go to 23009
+            if( i23005 .ge. 48 .and. i23005 .le. 57) go to 23007
+            go to 23011
+23006       continue
+c endselect
+23003    continue
+23004    continue
+         call setorg(n)
+23013    go to 23001
+c -- case 98
+c -- case 66
+23014 continue
+cb or B
+
+         bckeep = .not. bckeep
+23015    go to 23001
+c -- case 99
+c -- case 67
+23016 continue
+cc or C
+
+         do 23017 i=0,255
+            col1(i) = .false.
+23017    continue
+         do 23019 i=2,len(optstr)
+            c1 = ichar(optstr(i:i))
+c select
+            i23021=c1
+               go to 23021
+c -- case 32
+23023       continue
+               go to 23020
+23024          go to 23022
+c -- case (default)
+23025       continue
+               col1(c1) = .true.
+c -- dispatch area for select
+23026       go to 23022
+23021       continue
+            if( i23021 .eq. 32) go to 23023
+            go to 23025
+23022       continue
+c endselect
+23019    continue
+23020    continue
+23027    go to 23001
+c -- case 100
+c -- case 68
+23028 continue
+cd or D
+
+         ind1 = index(optstr, '=')
+         if(len(optstr) .eq. ind1) then
+            call cnstal(optstr(2:ind1-1), ' ')
+         else
+            call cnstal(optstr(2:ind1-1), optstr(ind1+1:))
+         endif
+         if(optstr(2:9) .eq. 'COMPILER' .and. optstr(11:15) .eq. 'CFT77'
+     &) icompile = 1
+23029    go to 23001
+c -- case 108
+c -- case 76
+23030 continue
+cl or L
+
+         col72 = 80
+23031    go to 23001
+c -- case 109
+c -- case 77
+23032 continue
+cm or M
+
+         basis = 0
+23033    go to 23001
+c -- case 102
+c -- case 70
+23034 continue
+cf or F
+
+c free form input: no col1 convention, no col6 convention
+         do 23035 i=0,255
+            col1(i) = .false.
+23035    continue
+         col6 = .false.
+23037    go to 23001
+c -- case 115
+c -- case 83
+23038 continue
+cs or S
+
+c restore standard continuation and col1 conventions
+         do 23039 i=0,255
+            col1(i) = .false.
+23039    continue
+cc
+         col1(99) = .true. 
+cC
+         col1(67) = .true. 
+         col1(42) = .true.
+         col6 = .true.
+23041    go to 23001
+c -- case 116
+c -- case 84
+23042 continue
+ct or T
+
+         sysnam=optstr(2:)
+         call cnstal('SYSTEM',sysnam)
+23043    go to 23001
+c -- case 117
+c -- case 85
+23044 continue
+cu or U
+
+         call upcastab
+         defupcas=1
+23045    go to 23001
+c -- case (default)
+23046 continue
+         go to 900
+c -- dispatch area for select
+23047 go to 23001
+23000 continue
+      if( i23000 .ge. 48 .and. i23000 .le. 57) go to 23002
+      if( i23000 .eq. 66) go to 23014
+      if( i23000 .eq. 67) go to 23016
+      if( i23000 .eq. 68) go to 23028
+      if( i23000 .eq. 70) go to 23034
+      if( i23000 .eq. 76) go to 23030
+      if( i23000 .eq. 77) go to 23032
+      if( i23000 .eq. 83) go to 23038
+      if( i23000 .eq. 84) go to 23042
+      if( i23000 .eq. 85) go to 23044
+      if( i23000 .eq. 98) go to 23014
+      if( i23000 .eq. 99) go to 23016
+      if( i23000 .eq. 100) go to 23028
+      if( i23000 .eq. 102) go to 23034
+      if( i23000 .eq. 108) go to 23030
+      if( i23000 .eq. 109) go to 23032
+      if( i23000 .eq. 115) go to 23038
+      if( i23000 .eq. 116) go to 23042
+      if( i23000 .eq. 117) go to 23044
+      go to 23046
+23001 continue
+c endselect
+      return 
+c bad options
+  900 continue
+      write(0,100) optstr
+  100 format(' Error in option....'/a)
+      call finish(1)
+      return 
+      end
+      subroutine upcastab
+cProlog
+
+c make all the macro names and definitions already in the table
+c all upper case
+
+      integer lastp,lastt,defptr(5000),deflen(5000)
+      integer namlen(5000),namptr(5000),nbuilt,defupcas
+      common /clook/ lastp,lastt,defptr,deflen,namlen,namptr,nbuilt,
+     &defupcas
+
+      integer table(125000)
+      common /clookc/ table
+      integer hshtab(0:501 - 1),nextdef(5000)
+      common /tree/hshtab,nextdef
+
+      integer pstck(5000),ptop,ustck(5000)
+      common /pstuff/pstck,ptop,ustck
+
+      character*8 sysnam
+      common /syscom1/sysnam
+      integer basis
+      common /syscom2/basis
+
+      integer ptr, name(10000), def(10000)
+      integer ldef,lnam,i,j,n
+c lastp is the number of existing macros
+c we start at the bottom, and each ptr eventually passes through the
+c bottom of the stack, because we undefine and redefine everything.
+      n=lastp
+      do 23000 i=1,n
+         ptr=ustck(1)
+         ldef=deflen(ptr)
+         lnam=namlen(ptr)
+         do 23002 j=1,ldef
+            def(j)=table(defptr(ptr) + j - 1)
+23002    continue
+         do 23004 j=1,lnam
+            name(j)=table(namptr(ptr) + j - 1)
+23004    continue
+         call unstal(name,lnam)
+         defupcas=1
+         call instal(name,lnam,def,ldef)
+         defupcas=0
+23000 continue
+      return 
+      end
+      subroutine setout(iout)
+cProlog
+
+
+      integer yyline(5),iusin(5),iusout,lnbt,inlev
+      integer lcbuf,modfun
+      common /cfile/yyline,iusin,iusout,outcom,lcbuf,modfun,lnbt,inlev
+
+      character*80 filnam(5)
+      character*32 modnac
+      common /cfilec/filnam, modnac
+      integer modnam(32)
+      common /cfiled/modnam
+
+      character*150 cbuf
+      character*150 cbsav(5)
+      integer lcsav(5)
+      common /cbsav1/ lcsav
+      common /cbsav2/ cbsav
+      common /cinbuf/cbuf
+
+      integer outbuf(10000),lastpc,col72
+      logical bckeep
+      common /cputc/outbuf,lastpc,col72,bckeep
+
+      integer bp,pblinl(5)
+      common /cdef/bp,pblinl
+
+      integer pbbuf(10000),pblins(10000,5)
+      common /cdefc/pbbuf,pblins
+
+      iusout = iout
+      return 
+      end
+      subroutine sewhile
+cProlog
+
+c do endwhile statement
+c put out go to L,endif
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      call outifl
+      call outtab
+      call outgo(labn(level))
+      level = level - 1
+      call outtab
+      call putqs('endif')
+      call outlin
+      call putqs('c endwhile')
+      call outlin
+      call spit
+      if(used(level+1) .eq. 1) call outcnt(labb(level+1))
+      return 
+      end
+      subroutine sif
+cProlog
+
+c process if statement
+c call docond to output condition & translate logical operators
+c if (condition) may be followed by
+c a. then -- put out as is
+c b. some other statement
+c     We check on the next line if nothing follow the cond.
+c Note that return(value) has to be handled correctly.
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      integer t,gnbtok,docond
+      external gnbtok,docond
+c
+      call outtab
+      call putqs('if')
+      if(docond() .ne. 0) then
+         return 
+      endif
+      t = gnbtok(token,ltoken)
+c while(t == 13)
+23000 if(t .eq. 13)  then
+         t = gnbtok(token,ltoken)
+         go to 23000
+      endif
+c endwhile
+      if(t .eq. 219) then
+         call putqs('then')
+         call outlin
+         iflevel = iflevel + 1
+         call spit
+      elseif(t .eq. 243) then
+         call putqs('then')
+         call outlin
+         iflevel = iflevel + 1
+         call doret
+         iflevel = iflevel - 1
+         call outtab
+         call putqs('endif')
+         call outlin
+      elseif(t .eq. 209) then
+         call sbrk
+      elseif(t .eq. 210) then
+         call snext
+      else
+         call putchr(token,ltoken)
+         call eatup
+      endif
+      return 
+      end
+      subroutine snext
+cProlog
+
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      integer t,gnbtok,toktoi
+      external gnbtok,toktoi
+      integer nlev
+c look for digit after the next
+      t = gnbtok(token,ltoken)
+      if( t .eq. 129) then
+         nlev = toktoi(token,ltoken) - 1
+         t = gnbtok(token,ltoken)
+      else
+         nlev = 0
+      endif
+c shouldn't be anything else here
+      if( t .ne. 13) then
+         call warn('Illegal syntax in -next- statement.')
+         return 
+      elseif(level-nlev .le. 0) then
+         call warn('Illegal -next- statement, level wrong')
+         return 
+      endif
+      call outtab
+      call outgo(labn(level-nlev))
+      return 
+      end
+      subroutine spit
+cProlog
+
+c delete to end of line, inclusive
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      integer gtok
+      external gtok
+      integer t
+c while(gtok(token,ltoken) <> 13 )
+23000 if(gtok(token,ltoken) .ne. 13 )  then
+         go to 23000
+      endif
+c endwhile
+      return 
+      end
+      subroutine suntil
+cProlog
+
+c end block do with until( condition)
+c translates to: if(.not.(condition)) go to L ; enddo
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      integer docond
+      external docond
+      if(level .eq. 0 ) then
+         call warn('Extraneous until statement.')
+         return 
+      elseif(dotype(level) .ne. 3) then
+         call warn('Until statement in wrong kind of do loop.')
+         return 
+      endif
+      call outifl
+      level = level - 1
+      call outtab
+      call putqs('if( .not. ')
+      if(docond() .ne. 0) then
+         return 
+      endif
+      call putchr(41,1)
+      call outgo(labn(level+1))
+      call spit
+      if(used(level+1) .eq. 1) call outcnt(labb(level+1))
+      return 
+      end
+      subroutine swhile
+cProlog
+
+c translate while(cond) to
+c       continue   (in case this statement was labeled)
+c L     if(cond) then
+c
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      integer docond
+      external docond
+c
+      call outifl
+      n = labgen(2)
+      call puti5(n)
+      call outtab
+      call putqs('if')
+      if(docond() .ne. 0) then
+         return 
+      endif
+      call putqs(' then')
+      call outlin
+      level = level + 1
+      labn(level) = n
+      labb(level) = n + 1
+      used(level) = 0
+      dotype(level) = 4
+      call spit
+      return 
+      end
+      function toktoi(token,toksiz)
+cProlog
+
+c convert a token to an integer
+      integer toktoi,token(1),toksiz,i,j,k,isgn
+      toktoi = 0
+      isgn = 1
+      do 23000 j=1,toksiz
+         if(token(j) .ne. 32) go to 23001
+23000 continue
+23001 continue
+      if(token(j) .eq. 45) then
+         isgn = -1
+         k=j + 1
+         do 23002 j=k,toksiz
+            if(token(j) .ne. 32) go to 23003
+23002    continue
+23003    continue
+      endif
+      do 23004 i=j,toksiz
+         toktoi = toktoi*10 + token(i) - 48
+23004 continue
+      toktoi = toktoi*isgn
+      return 
+      end
+      subroutine sselect
+cProlog
+
+c sselect - generate code for beginning of select statement
+      integer lab
+      integer labgen, gnbtok
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      lab = labgen(2)
+      if(sellast + 3 .gt. 500) call oops('select table overflow.')
+      call outifl
+      call putqs('c select')
+      call outlin
+c Innn=(e)
+      call outtab 
+      call selvar(lab)
+      t = gnbtok(token,ltoken)
+      if(t .eq. 13) then
+         call warn('select statement syntax error.')
+         return 
+      endif
+      if(t .ne. 61) call putchr(61,1)
+      call putchr(token,ltoken)
+      call eatup
+      sellev = sellev + 1
+      if(sellev .gt. 10) call oops(
+     &'select statements nested too deeply.')
+      sellab(sellev) = lab
+c the triplets in selstak represent lower, upper bounds + label
+c in the FIRST one however, at seltop,
+c selstak(seltop) = previous seltop
+c selstak(seltop+1) = number of cases in this select so far
+c selstak(seltop+2) = label for default case, 0 if no default stat yet.
+      selstak(sellast) = seltop
+      selstak(sellast+1) = 0
+      selstak(sellast+2) = 0
+      seltop = sellast
+      sellast = sellast + 3
+      call outtab
+c goto L
+      call outgo(lab) 
+      return 
+      end
+      subroutine scase(td)
+cProlog
+
+c case or default statement
+c td is SCASE or SDEFAULT
+      integer td
+      integer t, l, lb, ub, i, j
+      integer caslab, labgen, gnbtok
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      if(sellev .le. 0) then
+         call warn('illegal case or default.')
+         return 
+      endif
+      call outifl
+      lab = sellab(sellev)
+      if(selstak(seltop+1) .gt. 0) then
+c in case the previous statement was a break or other goto, label this one
+         i = labgen(1)
+         call puti5(i)
+         call outtab
+c terminate previous case
+         call outgo(lab+1) 
+      endif
+      l = labgen(1)
+      if(td .eq. 221) then
+c case n[,n]... : ...
+c while(caslab(lb, t) <> 13 )
+23000    if(caslab(lb, t) .ne. 13 )  then
+            ub = lb
+            if(t .eq. 45) junk = caslab(ub, t)
+            if(lb .gt. ub) then
+               call warn('illegal range in case label.')
+               return 
+            endif
+            if(sellast + 3 .gt. 500) call oops('select table overflow.')
+c -- for(i = seltop + 3, i < sellast, i = i + 3)
+            i = seltop + 3
+            go to 23002
+23003       continue
+               i = i + 3
+23002          if(.not.( i .lt. sellast)) go to 23004
+               if(lb .le. selstak(i)) then
+                  go to 23004
+               elseif(lb .le. selstak(i+1)) then
+                  call warn('duplicate case label.')
+                  return 
+               endif
+c -- repeat
+            go to 23003
+23004       continue
+c endfor
+            if(i .lt. sellast .and. ub .ge. selstak(i)) then
+               call warn('duplicate case label.')
+               return 
+            endif
+c insert new entry
+c -- for(j = sellast, j > i, j = j - 1)
+            j = sellast
+            go to 23005
+23006       continue
+               j = j - 1
+23005          if(.not.( j .gt. i)) go to 23007
+               selstak(j+2) = selstak(j-1)
+c -- repeat
+            go to 23006
+23007       continue
+c endfor
+            selstak(i) = lb
+            selstak(i+1) = ub
+            selstak(i+2) = l
+            selstak(seltop+1) = selstak(seltop+1) + 1
+            sellast = sellast + 3
+            call putqs('c -- case ')
+            call outnum(lb)
+            if(ub .gt. lb) then
+               call putqs('- ')
+               call outnum(ub)
+            endif
+            call outlin
+            if(t .eq. 58) then
+               go to 23001
+            elseif(t .ne. 44) then
+               call warn('illegal case syntax.')
+               return 
+            endif
+            go to 23000
+         endif
+c endwhile
+23001    continue
+c default : ...
+      else
+         call putqs('c -- case (default)')
+         call outlin
+         t = gnbtok(token, ltoken)
+         if(selstak(seltop+2) .ne. 0) then
+            call warn('multiple defaults in select statement.')
+            return 
+         endif
+         selstak(seltop+2) = l
+      endif
+      if(t .ne. 58) call inform(
+     &'missing colon in case or default label.')
+      sellev = sellev - 1
+      call outcnt(l)
+      sellev = sellev + 1
+      return 
+      end
+      function caslab(n, t)
+cProlog
+
+c caslab - get one case label
+      integer caslab
+      integer n, t
+      integer i, s
+      integer gnbtok, toktoi
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      t = gnbtok(token, ltoken)
+      if(t .eq. 13) then
+         caslab                           = (t)
+         return
+      endif
+      if(t .eq. 45) then
+         s = -1
+      else
+         s = +1
+      endif
+      if(t .eq. 45 .or. t .eq. 43) t = gnbtok(token, ltoken)
+      if(t .ne. 129) then
+         call inform('invalid case label.')
+         t = 58
+         n = 9999
+         return 
+      endif
+      n = s*toktoi(token,ltoken)
+c get next token (should be comma or colon)
+      t = gnbtok(token, ltoken)
+      return 
+      end
+      subroutine seselect
+cProlog
+
+c seselect - finish off select statement; generate dispatch code
+      integer lab
+      integer lb, ub, n, i, j
+
+      integer level,iflevel
+      integer dotype(0:10),labn(0:10)
+      integer labb(0:10),used(0:10)
+      integer token(250),ltoken
+      common /stat/level,iflevel,dotype,labn,labb,used,token,ltoken
+      integer decide(0:255)
+      common /decid/decide
+      integer seltop 
+      integer sellast 
+      integer selstak 
+      integer sellev 
+      integer sellab 
+      common /csel/ sellev,seltop, sellast, selstak(500),sellab(10)
+
+      if(sellev .le.0) then
+         call warn('Unmatched endselect.')
+         return 
+      endif
+      lab = sellab(sellev)
+      lb = selstak(seltop+3)
+      ub = selstak(sellast-2)
+      n = selstak(seltop+1)
+      sellev = sellev - 1
+      call outifl
+      call putqs('c -- dispatch area for select')
+      call outlin
+      if( n .gt. 0 ) then
+c in case the previous statement was a break or other goto, label this one
+         i = labgen(1)
+         call puti5(i)
+         call outtab
+c terminate last case
+         call outgo(lab+1) 
+      endif
+c default default label
+      if(selstak(seltop+2) .eq. 0) selstak(seltop+2) = lab + 1 
+c L   continue
+      call outcnt(lab) 
+      if(n .ge. 3 .and. ub - lb + 1 .lt. 3 * n ) then
+c output branch table
+         if(lb .ne. 1) then
+c L  Innn=Innn-lb+1
+            call outtab
+            call selvar(lab)
+            call putchr(61,1)
+            call selvar(lab)
+            if(lb .lt. 1) call putchr(43,1)
+            call outnum(-lb + 1)
+            call outlin
+         endif
+c  if(Innn.lt.1.or.Innn.gt.ub-lb+1)goto default
+         call outtab 
+         call putqs('if(')
+         call selvar(lab)
+         call putqs('.lt. 1 .or. ')
+         call selvar(lab)
+         call putqs('.gt.')
+         call outnum(ub - lb + 1)
+         call putqs(') go to ')
+         call puti5(selstak(seltop+2))
+         call outlin
+c go to (....), Innnn
+         call outtab
+         call putqs('go to (')
+         j = lb
+c -- for(i = seltop + 3, i < sellast, i = i + 3)
+         i = seltop + 3
+         go to 23000
+23001    continue
+            i = i + 3
+23000       if(.not.( i .lt. sellast)) go to 23002
+c -- for( , j < selstak(i), j = j + 1)
+
+            go to 23003
+23004       continue
+               j = j + 1
+c fill in vacancies
+23003          if(.not.( j .lt. selstak(i))) go to 23005
+               call outnum(selstak(seltop+2))
+               call putchr(44,1)
+c -- repeat
+            go to 23004
+23005       continue
+c endfor
+c -- for(j = selstak(i+1) - selstak(i), j >= 0, j = j - 1)
+            j = selstak(i+1) - selstak(i)
+            go to 23006
+23007       continue
+               j = j - 1
+23006          if(.not.( j .ge. 0)) go to 23008
+c fill in range
+               call outnum(selstak(i+2)) 
+               if((i .lt. sellast - 3) .or. (j .gt. 0)) call putchr (44,
+     &1)
+c -- repeat
+            go to 23007
+23008       continue
+c endfor
+            j = selstak(i+1) + 1
+c -- repeat
+         go to 23001
+23002    continue
+c endfor
+         call putqs('), ')
+         call selvar(lab)
+         call outlin
+      elseif(n .gt. 0) then
+c output linear search form
+c -- for(i = seltop + 3, i < sellast, i = i + 3)
+         i = seltop + 3
+         go to 23009
+23010    continue
+            i = i + 3
+23009       if(.not.( i .lt. sellast)) go to 23011
+c if(Innn
+            call outtab 
+            call putqs('if( ')
+            call selvar(lab)
+            if(selstak(i) .eq. selstak(i+1)) then
+c   .eq....
+               call putqs(' .eq. ') 
+               call outnum(selstak(i))
+            else
+c   .ge.lb.and.Innn.le.ub
+               call putqs(' .ge. ') 
+               call outnum(selstak(i))
+               call putqs(' .and. ')
+               call selvar(lab)
+               call putqs(' .le. ')
+               call outnum(selstak(i+1))
+            endif
+c ) go to ....
+            call putqs(') ') 
+            call outgo(selstak(i+2))
+c -- repeat
+         go to 23010
+23011    continue
+c endfor
+         if(lab + 1 .ne. selstak(seltop+2)) then
+            call outtab
+            call outgo(selstak(seltop+2))
+         endif
+      endif
+c L+1  continue
+      call outcnt(lab+1) 
+      call putqs('c endselect')
+      call outlin
+c pop select stack
+      sellast = seltop 
+      seltop = selstak(seltop)
+      call spit
+      return 
+      end
+      subroutine selvar(lab)
+cProlog
+
+      integer lab
+      call putqs('i')
+      call outnum(lab)
+      return 
+      end
+      subroutine outnum(n)
+cProlog
+
+      integer n,i
+      character*16 msg
+      common /onc/ msg
+      write(msg,100) n
+  100 format(i16)
+c -- for(i = 1 , i<16 & msg(i:i) = ' ', i=i+1)
+      i = 1 
+      go to 23000
+23001 continue
+         i=i+1
+23000    if(.not.( i.lt.16 .and. msg(i:i) .eq. ' ')) go to 23002
+c -- repeat
+      go to 23001
+23002 continue
+c endfor
+      call putqs(msg(i:16))
+      return 
+      end
+c
+      subroutine domath(argstk,i,j)
+cProlog
+
+c this subroutine evaluates an expression
+      integer evalone
+      external evalone
+      integer argstk(1),i,j
+      integer ival, ierr
+      integer jrem,jq,a1,a2
+      integer i0,pos,k
+      character*(125) str
+
+      integer cp 
+      integer ep 
+      integer mline(30),mlev(30)
+
+      common /cmacro/ cp,ep,mline,mlev
+
+      integer evalst(10000) 
+      common /cmacrc/ evalst
+
+
+
+      integer type(0:255)
+      integer alphan(0:255)
+      integer contu(0:255)
+      integer tokgo(0:255)
+      logical prtok(0:255)
+      logical col1(0:255)
+      logical col6
+      common /ctype/type,alphan,contu,contb,tokgo,prtok,col1,col6
+
+      ierr = 0
+      ival = 0
+      pos = 1
+c if there are too many arguments
+      if(i+2 .ne.j) then
+         call warn('Too many arguments to Evaluate macro')
+         ierr=1
+      else
+         i0 = 48
+         a1=argstk(i+2)
+         a2=argstk(i+3)
+         if(a2-a1 .gt. 125) then
+            call warn('Too long an argument to Evaluate macro')
+            ierr = 1
+            return 
+         endif
+c if the string is not null, create the character string
+         if(a1.ne.a2) then
+c -- for(k=a1,k<a2,k=k+1)
+            k=a1
+            go to 23000
+23001       continue
+               k=k+1
+23000          if(.not.(k.lt.a2)) go to 23002
+               str(pos:pos) = char(evalst(k))
+               pos=pos+1
+c -- repeat
+            go to 23001
+23002       continue
+c endfor
+            str(pos: )=' '
+c evaluate the string
+            ival=evalone(str,ierr)
+         endif
+      endif
+      if(ierr.eq.1) then
+c an error occurred
+         call pbstr(evalst(a1),a2-a1)
+c put the anwswer back
+      else
+         jrem=abs(ival)
+         if(jrem.eq.0) then
+            call putbak(i0)
+            return 
+         endif
+c while(jrem>0)
+23003    if(jrem.gt.0)  then
+            jq=jrem/10
+            call putbak(i0+jrem-jq*10)
+            jrem=jq
+            go to 23003
+         endif
+c endwhile
+         if(ival.lt.0) then
+            call putbak(45)
+         endif
+      endif
+      return 
+      end
+c
+      function evalone(str, ierr)
+cProlog
+
+c
+c   This fuction returns the value of a vlaid infix integer
+c   expression. If it cannot be evaluated, it returns 0
+c   and ierr = ERR
+c
+c   extended by
+c   Cathleen Benedetti
+c   10-13-86
+c
+c   VARIABLES
+c
+c
+
+      character*(8) act1 
+      integer act2, move, stray,stop, numray,numtop 
+      common /ceo/ act1(26)
+      common /ceo1/ act2(26,8), move(26,4)
+      common /ceo2/ stray(125), stop, numray(125), numtop
+
+c function name
+      integer evalone 
+c input string
+      character*(*) str 
+c delimits current token in str
+c length of str
+c type of current token
+c value of integer token
+c value of expression
+      integer i,j,  lstr,  tok,  term,  total 
+c index to act1,act2
+c current state,next state
+c temporary variable
+      integer index,  state,nstate,  t 
+c current action
+c next input
+      character*(1) action,  nxtin 
+c
+c functions
+      integer evaltokn,stlength 
+c functions
+      external evaltokn,stlength 
+c
+c   ***********initialize**************
+c
+      total = 0
+      ierr = 0
+      action = 'e'
+      stop = 0
+      numtop = 0
+      state = 2
+      call evpush(state,stray,stop,ierr)
+      lstr = stlength(str)
+c
+c -- for(i=1, (ierr = 0 & action <>'a'), i = j+1)
+      i=1
+      go to 23000
+23001 continue
+         i = j+1
+23000    if(.not.( (ierr .eq. 0 .and. action .ne.'a'))) go to 23002
+         tok = evaltokn(str,i,j,ierr,lstr)
+         if(ierr .eq. 0) then
+            call getin(tok,i,j,str,term,nxtin,index)
+            action = 'e'
+c while(ierr=0 & action .ne. 'a' & action .ne. 's')
+23003       if(ierr.eq.0 .and. action .ne. 'a' .and. action .ne. 's') 
+     & then
+               state=stray(stop)
+               action=act1(state)(index:index)
+               nstate=act2(state,index)
+c select
+               i23005= ichar(action)
+                  go to 23005
+c -- case 101
+23007          continue
+c  error
+                  ierr = 1 
+23008             go to 23006
+c -- case 97
+23009          continue
+c accept
+                  call evpop(total, numray, numtop, ierr) 
+23010             go to 23006
+c -- case 115
+23011          continue
+                  if(nxtin .eq. '#') then
+c shift
+                     call evpush (term, numray, numtop, ierr)
+                  else
+                     t = ichar(nxtin)
+                     call evpush(t,numray,numtop,ierr)
+                  endif
+                  call evpush (nstate, stray, stop, ierr)
+23012             go to 23006
+c -- case 114
+23013          continue
+c reduce
+
+                  call operate (ierr, nstate, stray, stop, numray, 
+     &numtop)
+c select
+                  i23014= nstate
+                     go to 23014
+c -- case 2
+c -- case 3
+c -- case 4
+c -- case 5
+c -- case 6
+c -- case 7
+23016             continue
+                     state = move(stray(stop),1)
+23017                go to 23015
+c -- case 8
+c -- case 9
+c -- case 10
+23018             continue
+                     state = move(stray(stop),2)
+23019                go to 23015
+c -- case 11
+c -- case 12
+c -- case 13
+23020             continue
+                     state = move(stray(stop),3)
+23021                go to 23015
+c -- case 14
+c -- case 15
+23022             continue
+                     state = move(stray(stop),4)
+23023                go to 23015
+c -- case (default)
+23024             continue
+                     call oops('evalsub1:bad input state')
+c -- dispatch area for select
+23025             go to 23015
+23014             continue
+                  i23014=i23014-1
+                  if(i23014.lt. 1 .or. i23014.gt.14) go to 23024
+                  go to (23016,23016,23016,23016,23016,23016,23018,23018
+     &,23018,23020,23020,23020,23022,23022), i23014
+23015             continue
+c endselect
+                  call evpush (state,stray, stop, ierr)
+23026             go to 23006
+c -- case (default)
+23027          continue
+                  call oops ('evalsub1: bad input action')
+c -- dispatch area for select
+23028          go to 23006
+23005          continue
+               if( i23005 .eq. 97) go to 23009
+               if( i23005 .eq. 101) go to 23007
+               if( i23005 .eq. 114) go to 23013
+               if( i23005 .eq. 115) go to 23011
+               go to 23027
+23006          continue
+c endselect
+               go to 23003
+            endif
+c endwhile
+         endif
+c -- repeat
+      go to 23001
+23002 continue
+c endfor
+      evalone                          = (total)
+      return
+      end
+c
+c
+      function evaltokn(str, i, j, ierr,lstr)
+cProlog
+
+c
+c  this function determines whether the current token
+c  invalid, eof, an operator, an integer, or a variable
+c
+c  str      input string
+c  i,j      position of token in strinteger evaltok
+c  c1       integer value of current character
+c
+c
+      integer evaltokn
+      character*(*) str
+      integer i,j,lstr, c1
+c
+c
+      ierr = 0
+c while((str(i:i)=' ') & (i<=lstr))
+23000 if((str(i:i).eq.' ') .and. (i.le.lstr))  then
+         i=i+1
+         go to 23000
+      endif
+c endwhile
+      if(i.gt.lstr) then
+c it's the end of the string
+         evaltokn                         = (101) 
+         return
+      endif
+      c1 = ichar(str(i:i))
+      if(c1.eq.40.or.c1.eq.41.or.c1.eq.42.or.c1.eq.43.or.c1.eq.45.or.c1
+c  (, ), *, +, -, /
+     &.eq.47) then
+         j=i
+c it's an operator
+         evaltokn                         = (100) 
+         return
+      elseif(c1 .ge. 48 .and. c1 .le. 57) then
+c integer
+c -- for(j = i + 1, j <= lstr, j = j + 1)
+         j = i + 1
+         go to 23002
+23003    continue
+            j = j + 1
+23002       if(.not.( j .le. lstr)) go to 23004
+            c1 = ichar(str(j:j))
+            if(c1 .lt. 48 .or. c1 .gt. 57) go to 23004
+c -- repeat
+         go to 23003
+23004    continue
+c endfor
+         j = j -1
+c it's an integer
+         evaltokn                         = (102) 
+         return
+      else
+         ierr = 1
+c it's a bad character
+         evaltokn                         = (101) 
+         return
+      endif
+      end
+c
+      function stlength(str)
+cProlog
+
+c this fucntion returns the length of str
+      integer stlength,temp
+      character*(*) str
+c
+      temp=len(str)
+c while(str(temp:temp) = ' ')
+23000 if(str(temp:temp) .eq. ' ')  then
+         temp=temp-1
+         go to 23000
+      endif
+c endwhile
+      stlength                         = (temp)
+      return
+      end
+c
+      subroutine getin(tok,i,j,str,term,nxtin,index)
+cProlog
+
+c
+c type of token
+c delimiters
+c value of integer token
+c index to arrays
+c temporary variable
+      integer tok,  i,j,  term,  index,  t 
+c input string
+      character*(*) str 
+c next input
+      character*(1) nxtin 
+c
+c select
+      i23000= tok
+         go to 23000
+c -- case 101
+23002 continue
+
+         index=7
+         nxtin = '$'
+23003    go to 23001
+c -- case 100
+23004 continue
+
+         index=ichar(str(i:i))-39
+         nxtin=str(i:i)
+23005    go to 23001
+c -- case 102
+23006 continue
+
+         index=5
+         nxtin = '#'
+         t=i
+         term=0
+c while(t<=j)
+23007    if(t.le.j)  then
+            term=term*10+(ichar(str(t:t))-48)
+            t=t+1
+            go to 23007
+         endif
+c endwhile
+23009    go to 23001
+c -- case (default)
+23010 continue
+         call oops('getin:impossible token from evaltok')
+c -- dispatch area for select
+23011 go to 23001
+23000 continue
+      i23000=i23000-99
+      if(i23000.lt. 1 .or. i23000.gt.3) go to 23010
+      go to (23004,23002,23006), i23000
+23001 continue
+c endselect
+      return 
+      end
+c
+      subroutine operate(ierr, p, stray, stop, numray, numtop)
+cProlog
+
+      integer stray(1), numray(1), stop, numtop
+      integer first, second, temp, p, optr, value
+c
+c this subroutine performs a reduction
+c
+c p corresponds to the production being used
+      if(p.lt.2 .or. p.gt.15) then
+         ierr = 1
+      elseif(p.eq.2 .or. p.eq.8 .or. p.eq.11 .or. p.eq.14) then
+         call evpop(temp, stray, stop, ierr)
+      elseif(p.eq.15) then
+         do 23000 k=1,3
+            call evpop(temp, stray, stop, ierr)
+23000    continue
+         call evpop(temp, numray, numtop, ierr)
+         call evpop(value, numray, numtop,ierr)
+         call evpop(temp, numray, numtop, ierr)
+         call evpush (value,numray,numtop,ierr)
+      else
+         do 23002 k=1,2
+            call evpop(temp, stray, stop, ierr)
+23002    continue
+         call evpop(second, numray, numtop, ierr)
+         call evpop(optr, numray, numtop, ierr)
+         if(p.eq.3) then
+            value = -second
+         else
+            call evpop(temp, stray, stop, ierr)
+            call evpop(first, numray, numtop, ierr)
+            if(p .ne. 5 .and. p .ne. 7) then
+c select
+               i23004= optr
+                  go to 23004
+c -- case 42
+23006          continue
+                  value = first * second
+23007             go to 23005
+c -- case 43
+23008          continue
+                  value = first + second
+23009             go to 23005
+c -- case 45
+23010          continue
+                  value = first - second
+23011             go to 23005
+c -- case 47
+23012          continue
+                  if(second .ne.0) then
+                     value = first/second
+                  else
+                     call oops('evaluate macro--divide by zero')
+                  endif
+c -- dispatch area for select
+23013          go to 23005
+23004          continue
+               i23004=i23004-41
+               if(i23004.lt. 1 .or. i23004.gt.6) go to 23005
+               go to (23006,23008,23005,23010,23005,23012), i23004
+23005          continue
+c endselect
+            else
+               call evpop(temp, numray, numtop, ierr)
+               call evpop (temp, stray, stop, ierr)
+c select
+               i23014= optr
+                  go to 23014
+c -- case 45
+23016          continue
+                  value = -first - second
+23017             go to 23015
+c -- case 43
+23018          continue
+                  value = -first + second
+c -- dispatch area for select
+23019          go to 23015
+23014          continue
+               if( i23014 .eq. 43) go to 23018
+               if( i23014 .eq. 45) go to 23016
+23015          continue
+c endselect
+            endif
+         endif
+         call evpush (value, numray,numtop, ierr)
+      endif
+      return 
+      end
+c
+c
+      subroutine evpop(item, stack, top, ierr)
+cProlog
+
+      integer item, stack, top
+      dimension stack(1)
+c
+c this function pops an integer off an integer stack
+c
+      item = 0
+      if(top.gt.0) then
+         item = stack(top)
+         top = top - 1
+      else
+         ierr = 1
+      endif
+      return 
+      end
+c
+c
+      subroutine evpush(item, stack, top, ierr)
+cProlog
+
+      integer item, stack, top
+      dimension stack(1)
+c
+c this subroutine pushes an integer onto an integer stack
+c
+      if(top .lt. 125 ) then
+         top = top + 1
+         stack(top) = item
+      else
+         ierr = 1
+      endif
+      return 
+      end
+      subroutine getb
+cProlog
+
+cdefine those Basis definitions which do not depend on the system
+      call cnstal('Point','p$1')
+      call cnstal('Use', 'ifelse($1,,[Errprint([use statement error])],'
+     &// '[ifdef([Use$1],[Use$1],[Errprint(group unknown: $1)])])')
+      call cnstal('TRUE','[.true.]')
+      call cnstal('FALSE','[.false.]')
+      call cnstal('STDIN','5')
+      call cnstal('STDOUT','6')
+      call cnstal('STDERR','6')
+      call cnstal('YES','1')
+      call cnstal('NO','0')
+      call cnstal('OK','0')
+      call cnstal('ERR','-1')
+      call cnstal('DONE','1')
+      call cnstal('DEFAULT','-999999')
+      call cnstal('Number_of_Database_Words','30')
+      call cnstal('DYNAM','100')
+      call cnstal('NOTSET','-8192')
+      call cnstal('Pi','3.14159265358979323')
+      call cnstal('_integer','integer')
+      call cnstal('_real','real')
+      call cnstal('_complex','complex')
+      call cnstal('_logical','logical')
+      call cnstal('_character','character')
+      call cnstal('Ch','ifelse($1,,character,character*($1))')
+      call cnstal('_Ch','Ch($1)')
+      call cnstal('_double','double')
+      call cnstal('_Filename','Filename')
+      call cnstal('Filedes','integer')
+      call cnstal('_Filedes','Filedes')
+      call cnstal('Varname','character*(24)')
+      call cnstal('_Varname','Varname')
+      call cnstal('SLEEPING','0')
+      call cnstal('GENERATE','1')
+      call cnstal('UP','2')
+      call cnstal('Quote','''$*''')
+      call cnstal('SS_WIDTH','26')
+      call cnstal('SS_N','1')
+      call cnstal('SS_TC','2')
+      call cnstal('SS_PTR','3')
+      call cnstal('SS_NAML','4')
+      call cnstal('SS_NS','5')
+      call cnstal('SS_N1','6')
+      call cnstal('SS_M1','13')
+      call cnstal('SS_I1','20')
+      return 
+      end
+
+      subroutine bdunix
+cProlog
+
+c defs for Unix/Sun
+      call cnstal('Dynamic', 
+     &'pointer(Point($1),$1);$2 $1 ifelse([$3],,,([$3]))')
+      call cnstal('Filename','character*(128)')
+      call cnstal('CHAR_PER_WORD','4')
+      call cnstal('LOCS_PER_WORD','4')
+      return 
+      end
+      subroutine bdltss
+cProlog
+
+c defs for LTSS/CRAY
+
+      integer icompile
+      common /icom/ icompile
+
+      if(icompile .eq. 0) then
+         call cnstal('Dynamic', 
+     &'integer Point($1);pointer(Point($1),$1);$2 $1 ifelse([$3],,,([$3]
+     &))')
+      else
+         call cnstal('Dynamic', 
+     &'pointer(Point($1),$1);$2 $1 ifelse([$3],,,([$3]))')
+      endif
+      call cnstal('Filename','character*(8)')
+      call cnstal('CHAR_PER_WORD','8')
+      call cnstal('LOCS_PER_WORD','1')
+      return 
+      end
+      subroutine bdnlts
+cProlog
+
+c defs for NLTSS/CRAY
+
+      integer icompile
+      common /icom/ icompile
+
+      if(icompile .eq. 0) then
+         call cnstal('Dynamic', 
+     &'integer Point($1);pointer(Point($1),$1);$2 $1 ifelse([$3],,,([$3]
+     &))')
+      else
+         call cnstal('Dynamic', 
+     &'pointer(Point($1),$1);$2 $1 ifelse([$3],,,([$3]))')
+      endif
+      call cnstal('Filename','character*(128)')
+      call cnstal('CHAR_PER_WORD','8')
+      call cnstal('LOCS_PER_WORD','1')
+      return 
+      end
+      subroutine bdctss
+cProlog
+
+c defs for CTSS/CRAY
+
+      integer icompile
+      common /icom/ icompile
+
+      if(icompile .eq. 0) then
+         call cnstal('Dynamic', 
+     &'integer Point($1);pointer(Point($1),$1);$2 $1 ifelse([$3],,,([$3]
+     &))')
+      else
+         call cnstal('Dynamic', 
+     &'pointer(Point($1),$1);$2 $1 ifelse([$3],,,([$3]))')
+      endif
+      call cnstal('Filename','character*(128)')
+      call cnstal('CHAR_PER_WORD','8')
+      call cnstal('LOCS_PER_WORD','1')
+      return 
+      end
+      program aampp
+cProlog
+
+      integer i,argc,iargc,isstdin
+      character*32 arg
+
+
+      integer finerr
+      common /cerr/ finerr
+
+      call init
+      call bltin
+      call setout(6)
+      isstdin = 1
+      finerr = 0
+      argc = iargc(0)
+c Process options before files.
+      do 23000 i = 1,argc
+         call getarg(i,arg)
+         if(arg(1:1).eq.'-') then
+            call setopt(arg(2:))
+         endif
+23000 continue
+      do 23002 i = 1,argc
+         call getarg(i,arg)
+         if(arg(1:1).ne.'-') then
+            call dofile(arg)
+            isstdin = 0
+         endif
+23002 continue
+      if(isstdin .eq. 1) call dofile('__tty__')
+      if(finerr .eq. 1) then
+         call finish(1)
+      else
+         call finish(0)
+      endif
+      end
+
+
+      subroutine fopen(iunit,name,ierr)
+cProlog
+
+c open a file name on unit iunit, return ierr = 0 if o.k.
+      integer iunit,ierr
+      character*(*) name
+      open(unit=iunit,file=name,status='old',err=20)
+      ierr = 0
+      return 
+   20 ierr = -1
+      return 
+      end
+      subroutine mprompt(msg,n)
+cProlog
+
+      character*(*) msg
+      integer n
+      end
+      subroutine wrline(unit,msg,n)
+cProlog
+
+      integer n,unit
+      character msg(1)
+      write(unit,100) (msg(i),i=1,n)
+  100 format(132a1)
+      return 
+      end
+      subroutine rem(msg,n)
+cProlog
+
+      character msg(1)
+      integer n
+      write(0,100) (msg(i),i=1,n)
+  100 format(1x,132a1)
+      return 
+      end
+      subroutine rdline(unit,msg,n)
+cProlog
+
+      character*(*) msg
+      integer n,unit
+      read(unit,100,end=300) msg
+  100 format(a)
+      n = lnblnk(msg)
+      return 
+  300 continue
+      n = -1
+      return 
+      end
+
+      integer function lnblnk(msg)
+cProlog
+
+      character msg*(*)
+      n = len(msg)
+c while( msg(n:n) == ' ' )
+23000 if( msg(n:n) .eq. ' ' )  then
+         n = n-1
+         if( n .eq. 0 ) go to 23001
+         go to 23000
+      endif
+c endwhile
+23001 continue
+      lnblnk                           = (n)
+      return
+      end
+
+      subroutine howend
+cProlog
+
+      end
+      subroutine zpakchrz(sout,ain,n)
+cProlog
+
+      character sout(*)
+      integer ain(1),n,i
+      do 23000 i=1,n
+         sout(i) = char(ain(i))
+23000 continue
+      return 
+      end
+      subroutine fclose(iunit)
+cProlog
+
+      integer iunit
+      close(unit=iunit)
+      return 
+      end
+      subroutine finish(iflag)
+cProlog
+
+      call exit(iflag)
+      end
+      subroutine getsys(sysnam)
+cProlog
+
+      character*(*) sysnam
+      sysnam = 'UNIX'
+      return 
+      end

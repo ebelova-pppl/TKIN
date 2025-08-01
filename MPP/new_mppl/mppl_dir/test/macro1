@@ -1,0 +1,12 @@
+#TESTCOMMAND: mppl
+# Test trailing comment with define
+
+define ESCAPE 127  # can't collide with normal text or flags below
+define LEXMAX 127
+
+      if (foo) then
+         call foo
+      elseif (t <> ESCAPE) then
+         call bar
+      endif
+

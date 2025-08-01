@@ -1,0 +1,20 @@
+#TESTCOMMAND: mppl --isf90
+# Test some f90 construct
+# Mainly things like continuations and comments
+
+      a = "foo & &
+        &bar"
+      b = "abcd&
+          &efgh&
+          &ijkl"
+      c = "12345&
+6789"
+
+     a=&   ! this is a comment
+     b
+     c=&
+     d
+
+      call baserror( &
+   "ERROR: increment field on assignment target is illegal abcdefghijkl&
+   &mnopqrstuvwxyz")

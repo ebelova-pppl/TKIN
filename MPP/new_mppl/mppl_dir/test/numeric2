@@ -1,0 +1,83 @@
+#TESTCOMMAND: mppl -w
+# Test subsidiary intrinsic functions
+
+# Test "int()"
+      a = 1 .int. 2
+      a = int(1)
+      a = int(1,Size2)
+      a = int(1,Size4)
+      a = int(1,Size8)
+      a = int(1,2)
+      a = int(1,4)
+      a = int(1,8)
+      a = int(f(int(1,Size4),g(h(int(4,Size8)))), Size8)
+      a = int(f(int(1,Size2),g(h(int(4,Size4)))), Size4)
+
+# Test "nint()"
+      a = nint(1)
+      a = nint(1,Size2)
+      a = nint(1,Size4)
+      a = nint(1,Size8)
+      a = nint(1,2)
+      a = nint(1,4)
+      a = nint(1,8)
+      a = nint(f(nint(1, Size4),g(h(nint(4,Size8)))), Size8)
+      a = nint(f(nint(1, Size2),g(h(nint(4,Size4)))), Size4)
+
+# Test "aint()"
+      a = aint(1.0_Size4)
+      a = aint(1.0,Size4)
+      a = aint(1.0_Size8)
+      a = aint(1.0,Size8)
+      a = aint(1.0_Size16)
+      a = aint(1.0,Size16)
+      a = aint(1.0_4)
+      a = aint(1.0,4)
+      a = aint(1.0_8)
+      a = aint(1.0,8)
+      a = aint(1.0_16)
+      a = aint(1.0,16)
+      a = aint(f(aint(1.2, 4)),Size8)
+      a = aint(f(aint(1.2, 8)),Size4)
+
+# Test "anint()"
+      a = anint(1.0_Size4)
+      a = anint(1.0,Size4)
+      a = anint(1.0_Size8)
+      a = anint(1.0,Size8)
+      a = anint(1.0_Size16)
+      a = anint(1.0,Size16)
+      a = anint(1.0_4)
+      a = anint(1.0,4)
+      a = anint(1.0_8)
+      a = anint(1.0,8)
+      a = anint(1.0_16)
+      a = anint(1.0,16)
+      a = anint(f(anint(1.2, 4)),Size8)
+      a = anint(f(anint(1.2, 8)),Size4)
+
+# Test "cmplx()": Takes 1, 2, or 3 args
+      a = cmplx(1.0_Size4)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0,2.0,Size4)
+      a = cmplx(1.0_Size8)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0,2.0,Size8)
+      a = cmplx(1.0_Size16)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0,2.0,Size16)
+      a = cmplx(1.0_4)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0,2.0,4)
+      a = cmplx(1.0_8)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0,2.0,8)
+      a = cmplx(1.0_16)
+      a = cmplx(1.0,2.0)
+      a = cmplx(1.0,2.0,16)
+      a = cmplx(f(cmplx(1.0_8, 2.0_8, 4), 2.0_8), 1., Size8)
+      a = cmplx(f(cmplx(1.0_8, 2.0_8, 16),2.0_8), 1., Size4)
+
+# Test "aimag" and "conjg"
+      a = aimag(z+y*x)
+      a = conjg(z+y*x)

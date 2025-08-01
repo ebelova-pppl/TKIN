@@ -1,0 +1,25 @@
+Format of test files: (There are 12 outputs from each input, testing
+various option combinations and capturing both stdout and stderr.)
+
+Example:
+numeric1: Input file for test 1.  Note the particular flags passed
+to mppl are given on the first line, as TESTCOMMAND.  These flags
+are added to the flag set "-r<Size> -t<SYSTEM>", which vary from
+run to run.
+
+Output files:
+numeric1.LINUX4.1: STDOUT output from mppl using -r4 -tLINUX on numeric1
+numeric1.LINUX4.2: STDERR ...
+numeric1.UNICOS4.1: STDOUT output from mppl using -r4 -tUNICOS on numeric1
+numeric1.UNICOS4.2: STDERR ...
+And so on for -r8 and -r16.
+
+Each output file is compared with its so-called fiducial copy.
+(Substitute "fid" for "tst" in the filenames above.)  There should be
+zero differences between the test output file and its fiducial version.
+
+You can compare an input file with its various output files to see
+how mppl translates its input, and to learn how to use the constructs
+available in the MPPL language.
+
+The makenewtest script is given to simplify construction of future tests.

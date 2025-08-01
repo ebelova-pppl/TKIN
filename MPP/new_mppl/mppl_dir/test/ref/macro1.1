@@ -1,0 +1,11 @@
+cTESTCOMMAND: mppl
+c Test trailing comment with define
+
+c can't collide with normal text or flags below
+
+      if (foo) then
+         call foo
+      elseif (t .ne. 127 ) then
+         call bar
+      endif
+

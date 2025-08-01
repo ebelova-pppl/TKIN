@@ -1,0 +1,31 @@
+#TESTCOMMAND: mppl -w
+# A test of implicit statement handling
+! And various styles and
+	 ! placement of comments 1.0 <- test literal constant in comment
+	 # comment
+C Comment
+c comment
+* comment
+
+      implicit real (a-h,o-z)
+      real x		! Junk inserted to make lexer change state
+      x = real(a,Size4) + 1.0
+      implicit integer (i-n)
+      real(Size4) x	# test comment
+      x = real(a,Size4) + 1.0!test comment
+      implicit real(Size4) (a-h,o-z)# test comment
+      implicit real(Size8) (a-h,o-z)! test comment
+      implicit real(Size16) (a-h,o-z)
+      real(Size8) x
+      x = real(a,Size4) + 1.0
+      implicit integer(Size2) (i-n)
+      implicit integer(Size4) (i-n)
+      implicit integer(Size8) (i-n)
+      real x
+      x = real(a,Size4) + 1.0
+      implicit real(a-h,o-z), integer(i-n)
+      real x
+      x = real(a,Size4) + 1.0
+      implicit integer(i-n), real(a-h,o-z), complex(c)
+      real x
+      x = real(a,Size4) + 1.0

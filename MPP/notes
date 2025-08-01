@@ -1,0 +1,9 @@
+# Franklin 8/12/09
+# generated new executable with PGf90 compiler:
+
+pgf90 -o mppl mppl.f
+
+# Hopper 4/18/2012
+# generated new executable using ftn wrapper:
+
+ftn -o mppl mppl.f

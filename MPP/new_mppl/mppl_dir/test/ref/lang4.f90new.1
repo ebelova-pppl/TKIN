@@ -1,0 +1,255 @@
+!TESTCOMMAND: mppl
+! Test if statements
+! source form
+!
+      subroutine foo
+                                       !Prolog
+
+! some parameter
+!%%%%%-included-file:../lang4.i 
+      integer nmax
+      parameter(nmax=249)
+
+      integer i,j,  &                  ! delimits current token in str
+           lstr,  &                    ! length of str
+           tok,  &                     ! type of current token
+           term,  &                    ! value of integer token
+           total                       ! value of expression
+
+      integer a,  b,  c
+
+! This is an explicit continue, since / is not a 'magic' continuation character
+      data lll1 /  &                   ! data
+           0,1,2,3,  &                 ! first line
+           4,5,6,7/                    ! second line
+
+      data lll2 /  0,1,2,3,  4,5,6,7/
+
+! test long lines
+
+      if (cat) dog = cat(10)
+
+! comment 0
+      if (cat ) dog = cat
+
+      dog = cat(10,20,30,40,50,60,70,80,90,00,10,20,30,40,50,60,70,80,90  &
+         ,100,110,0)
+
+      if (cat) then
+         dog = cat(10,20,30,40,50,60,70,80,90,00,10,20,30,40,50,60,70,80  &
+            ,90,100,110,0)
+      endif
+
+      if (cat1) then
+         dog = 1
+      elseif (cat2) then
+         dog = 2
+      elseif (cat3) then
+         dog = 3
+      elseif (cat4) then
+         dog = 4
+      elseif (cat5) then
+         dog = 5
+      else
+         dog = 6
+      endif
+
+      if (cat1) then                   ! comment 1
+         return
+      elseif (cat2) then               ! comment 2
+         return
+      elseif (cat3) then               ! comment 3
+         return
+      elseif (cat4) then               ! comment 4
+         return
+      elseif (cat5) &                  ! comment 5
+             then                      ! comment 5a
+         return
+      else                             ! comment 6
+         return
+      endif                            ! comment 7
+
+      if (monkey) &                    ! comment 8
+         monkey = 4
+
+      if (monkey) &                    ! comment 9
+         then                          ! comment 10
+         monkey = 4
+      endif
+
+! long comment
+      if (dog) &                       ! comment with long text blah blah blah blah blah blah blah
+         dog = 1
+      if (bird) bird = 1               ! comment fee fi foo fum, more and more and more
+
+! short comment
+      if (dog2) &                      ! comment
+         dog2 = 1
+      if (bird2) bird2 = 1             ! comment
+
+      if (cat) return
+
+! This line must be continued for f77
+      if ( ns .eq. 0 .or. ns .eq. 1 .and. ss (2, rlinkp + 1) .eq. 0) &
+            return
+
+      if (a123456789012345678901234567890 .eq. &
+         a123456789012345678901234567890) then
+         call baserror(  &
+            "ERROR: increment field on assignment target is illegal abc&
+            &defghijklmnopqrstuvwxyz")
+         call baserror(  &
+            'ERROR: increment field on assignment target is illegal abc&
+            &defghijklmnopqrstuvwxyz')
+      endif
+
+      a = 1 + 2 + 3 + 4 +  5 + 6 + 7 -  a - b *  x
+
+      if (token1 .or. token2 .or. token3 ) then
+         return
+      endif
+
+      if ((tt .eq. 1 .and. tt .ne. 2) .or. (tt .lt. 3 .and. tt .le. 4) &
+         .or. (tt .gt. 5 .and. tt .ge. 6.0) ) then
+         return
+      endif
+
+      if ((uu .ne. 1 .and. uu .ne. 2 .and. uu .ne. 3) .or. (uu .eq. 4 &
+         .and. uu .eq. 5) .or. (uu .lt. 6 .and. uu .le. 7) .or. (uu .gt.&
+          8 .and. uu .ge. 9) ) then
+         return
+      endif
+
+      call cnstal('for',c// '+***short***012345+'//  &
+         '+***long****abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVW&
+         &XYZ01234567890')
+
+      if (bpnew .gt. BUFSIZ) call oops('Macro processor error in pbstr:'&
+            //  ' too many characters pushed back'//  &
+            ' abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
+
+      if (bpnew .gt. BUFSIZ) call oops('Macro processor error in pbstr:'&
+            //  ' too many characters pushed back'//  &
+            ' abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
+
+      if (bpnew .gt. BUFSIZ) call oops('Macro processor error in pbstr:'&
+            //  ' too many characters pushed back'//  &
+            ' abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
+
+
+! Using 4 character indenting, this string will end at col 72.
+! In f90 mode, the continuation characters get put beyond that
+!23456789012345678901234567890123456789012345678901234567890123456789012
+      call ezcremrk(  &
+         "Contour plot data does not have an acceptable shape.123412341"  &
+         )
+
+! make sure numbers are treated as a single token to avoid splitting over lines
+      if (t .lt. 1.) then
+         val = 1. + t*(3.5156229 + t*(3.0899424 + t*(1.2067492 +  t*(&
+            .2659732 + t*(.0360768 + t*.0045813)))))
+      else
+         val = .39894228 + t*(.01328592 + t*(.00225319 + t*(-.00157565 +  &
+            t*(.00916281 + t*(-.02057706 + t*(.02635537 + t*(-.01647633 &
+            +  t*.00392377)))))))
+      endif
+
+! Treat // as a single token
+      if (pfbdebug .gt. 0) then
+         f(5:)=" files in glued family "//  fn1(1:utgetcl(fn1))  //" - "&
+            //fn2
+      endif
+
+! Process statements after ; in main loop so keywords will be expanded
+      xlog = .false.; if (scalea(1:3) .eq. "log") xlog = .true.
+
+! Do not end a line with a semicolon and white space
+      a12345678 = a1234567890 + a1234567890 + a1234567890 + a1234567890
+      b = b1234567890
+
+      a = a1234567890 + a1234567890 + a1234567890 + a1234567890; b =  &
+         b1234567890
+
+! Test real number tokenizing.
+! nextline.l parses most real numbers, but gettok must also parse them
+! since they may be pushed back into macros and re-tokenized.
+! The most significant part of this test is the number on the end.
+! It must not be split across lines.
+
+
+
+      external ismaxa()
+!23456789012345678901234567890123456789012345678901234567890123456789012
+      ismaxa(12345.67890, 12345.67890, 12345.67890, 12345.67890, &
+         12345.67890)
+      ismaxa(12345.67890, 12345.67890, 12345.67890, 12345.67890, &
+         .1234567890)
+      ismaxa(12345., 12345.67890, 12345.67890, 12345.67890, &
+         12345.67890e00)
+      ismaxa(12345., 12345.67890, 12345.67890, 12345.67890, &
+         12345.67890e+00)
+
+! The last .ne. is split over a line since mppl recognizes it as
+!  5. ne.  instead of 5 .ne.
+! This is a problem with parsing fortran in general.
+      if (1.ne.nnn .and. 2.ne.nnn .and. 3.ne.nnn .and. 4.ne.nnn .and. 5 &
+         .ne.nnn) then
+         foo = 1
+      endif
+
+
+  100 format(a8)
+  200 format(a8)
+
+      end subroutine
+
+
+      function bar
+                                       !Prolog
+
+      if (cat) then
+         bar = x
+         return
+      endif
+
+      if (cat2) then
+         bar = x
+         return
+      endif
+
+      if (cat3) &                      ! comment bar1
+         then
+         bar = x
+         return
+      endif
+
+      if (cat4) &                      ! comment bar2
+         then
+         bar = x                       ! comment bar3
+         return
+      endif
+
+      if (cat5) then
+         bar = x                       ! bar4
+         return
+      endif
+
+      bar = x
+      if (dog) return
+
+      if (x) then
+         bar = a123456789 + b123456789 + c123456789 + d123456789 +  &
+            e123456789 + f123456789
+         return
+      endif
+
+      bar = a123456789 + b123456789 + c123456789 + d123456789 +  &
+         e123456789 + f123456789
+      return
+
+! Test trailing blanks, to avoid a blank continued line
+      bar = aaaaaaa*2/((((bbbbbbb*x+ccccccc)*x+ddddd)*x+eeeee)*x+ffff)
+      return
+
+      end function
+

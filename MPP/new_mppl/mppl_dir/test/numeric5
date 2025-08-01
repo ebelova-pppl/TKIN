@@ -1,0 +1,24 @@
+#TESTCOMMAND: mppl -d -w
+# Test handling of quoted strings
+
+      "string with double quotes"
+      'string with single quotes'
+      "string with a ' in it"
+      'string with a " in it'
+      'string with a '' in it'
+      "string with a "" in it"
+      "1.0 + 2.0 + 3.0"
+      '1.0 + 2.0 + 3.0'
+      Quote(1.0 + 2.0 + 3.0)
+      write(*,*) "a = ", "2.5"
+      write(*,*) """Column header in double quotes"""
+      write(*,*) '"Column header in double quotes"'
+      write(*,*) '''Column header in single quotes'''
+      write(*,*) "'Column header in single quotes'"
+      call sub("string with # inside", 2.0) # The 2.0 should get converted
+      call sub('string with # inside', 2.0)
+      call sub('string with # inside'//Quote(3.0)//"string at end")
+      call sub('string with # 1.0 inside',2.0,"string at end: 3.0")
+      call setlimit("gl3.x","(n)")
+      # better not change this comment with a 3.0 in it
+      # nor this one with a "3.0" in it

@@ -1,0 +1,40 @@
+#TESTCOMMAND: mppl -w
+# Everything in here is supposed to be wrong!
+
+# Test "implicit real" statements
+      implicit real ( Size1 ) (a)
+
+# Test "implicit integer" statements
+      implicit integer ( Size16 ) (a)
+      implicit integer ( Size1 ) (a)
+
+# Test "implicit complex" statements
+      implicitcomplex(Size8)(a)
+      implicitcomplex(Size16) (a)
+      implicit complex ( Size1 ) (a)
+
+# Test real declarations
+      real(Size1) a
+      real(k) a
+
+# Test integer declarations
+      integer(Size16) a
+      integer(Size1) a
+      integer(k) a
+
+# Test complex declarations
+      complex(Size1) a
+      complex(k) a
+
+# Test real literal constants
+      d = 1.2_Size3
+      if(1.0. and .0.1) then
+      endif
+      f = 1.0-e-0
+
+# Test integer literal constants
+      if(1. and .2) then
+      endif
+
+# Test real as an intrinsic function
+      a = real(1.0,Size9)

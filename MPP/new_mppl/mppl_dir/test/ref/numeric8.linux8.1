@@ -1,0 +1,18 @@
+cTESTCOMMAND: mppl -w
+c Translations for (mostly) slatec functions
+
+
+
+
+
+
+
+
+c Example usage
+      subroutine foo
+cProlog
+      doubleprecision x, ddot
+      external dcopy, ddot
+      call dcopy(N, SX, INCX, SY, INCY)
+      x = ddot(N, SX, INCX, SY, INCY)
+      end

@@ -1,0 +1,44 @@
+#TESTCOMMAND: mppl --allocate
+# test allocate
+
+      allocate(foo(10))
+
+      allocate(foo(2:10))
+
+      allocate(foo(10,20))
+
+      allocate(foo(2:10,30))
+
+      allocate(foo(2:10,3:30))
+
+      allocate(foo(bar(1)))
+
+      allocate(foo(10), bar(20))
+
+      allocate(foo(10), stat=ierr)
+
+      allocate(foo(10), bar(20), stat=ierr)
+
+      deallocate(foo)
+
+      deallocate(foo, bar)
+
+      end
+
+define([Allocate],[name = Quote($1)
+      $2
+      shape = Shape($2)])
+
+      subroutine foo
+
+      allocate(foo(10))
+
+      allocate(foo(2:10))
+
+      allocate(foo(10,20))
+
+      allocate(foo(2:10,30))
+
+      allocate(foo(2:10,3:30))
+
+      end

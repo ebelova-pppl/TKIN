@@ -1,0 +1,36 @@
+cTESTCOMMAND: mppl -w
+c A test of implicit statement handling
+c And various styles and
+c placement of comments 1.0 <- test literal constant in comment
+c comment
+c Comment
+c comment
+c comment
+
+      implicit doubleprecision (a-h,o-z)
+c Junk inserted to make lexer change state
+      doubleprecision x
+      x = real(a) + 1.0d0
+      implicit integer (i-n)
+c test comment
+      real x
+ctest comment
+      x = real(a) + 1.0d0
+c test comment
+      implicit real (a-h,o-z)
+c test comment
+      implicit doubleprecision (a-h,o-z)
+      implicit doubleprecision (a-h,o-z)
+      doubleprecision x
+      x = real(a) + 1.0d0
+      implicit integer*2 (i-n)
+      implicit integer (i-n)
+      implicit integer (i-n)
+      doubleprecision x
+      x = real(a) + 1.0d0
+      implicit doubleprecision(a-h,o-z), integer(i-n)
+      doubleprecision x
+      x = real(a) + 1.0d0
+      implicit integer(i-n), doubleprecision(a-h,o-z), double complex(c)
+      doubleprecision x
+      x = real(a) + 1.0d0

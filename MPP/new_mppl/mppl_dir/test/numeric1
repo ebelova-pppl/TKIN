@@ -1,0 +1,153 @@
+#TESTCOMMAND: mppl -w
+# Everything in here is supposed to be ok.  (May produce warnings)
+
+# Test "implicit real" statements
+      implicit real(Size4) (a)
+      implicit real(Size8) (a)
+      implicit real(Size16) (a)
+      implicit real(4) (a)
+      implicit real(8) (a)
+      implicit real(16) (a)
+      implicit real*4 (a)
+      implicit real*8 (a)
+
+# Test "implicit integer" statements
+      implicit integer (Size2 ) (a)
+      implicit integer ( Size4 ) (a)
+      implicit integer( Size8) (a)
+      implicit integer (2 ) (a)
+      implicit integer ( 4 ) (a)
+      implicit integer( 8) (a)
+      implicit integer*4 (a)
+      implicit integer*8 (a)
+
+# Test "implicit complex" statements
+      implicit complex ( Size4 ) (a)
+      implicit complex ( Size8 ) (a)
+      implicit complex ( Size16 ) (a)
+      implicit complex ( 4 ) (a)
+      implicit complex ( 8 ) (a)
+      implicit complex ( 16 ) (a)
+      implicit complex*4 (a)
+      implicit complex*8 (a)
+
+# Test real declarations
+      real(Size4) a
+      real( Size8) a
+      real(Size16 ) a
+      real(4) a
+      real( 8) a
+      real(16 ) a
+      real a
+      real*4 a
+      real*8 a
+
+# Test integer declarations
+      integer (Size2) a
+      integer(Size4) a
+      integer(Size8) a
+      integer (2) a
+      integer(4) a
+      integer(8) a
+      integer a
+      integer*4 a
+      integer*8 a
+
+# Test complex declarations
+      complex(Size4) a
+      complex( Size8) a
+      complex(Size16 ) a
+      complex(4) a
+      complex( 8) a
+      complex(16 ) a
+      complex a
+      complex*4 a
+      complex*8 a
+
+# Test real literal constants
+      a = 1.2
+      b = -1.2e-4_Size4
+      b = -1.2e-41_Size8
+      b = -1.2e-423_Size16
+      b = -1.2e-4_4
+      b = -1.2e-41_8
+      b = -1.2e-423_16
+      c = +1.2_16
+      e = 1.234343434e-23_Size8
+      if(1.0.and.0.1) then
+      endif
+      if(1.0 .and. 0.1) then
+      endif
+      g = 1. + -2.
+      h = -1. + -.1
+
+# Test integer literal constants
+      a = 123
+      a = 123_Size2
+      a = 123_Size4
+      a = 123_Size8
+      a = 123_2
+      a = 123_4
+      a = 123_8
+      b = -123
+      c = +123_2 + 233_4 + -3343_8
+      if(1 .and. 2) then
+      endif
+      if(1.and.2) then
+      endif
+      if(1_2.and.2_4) then
+      endif
+
+# Test real as an intrinsic function
+      a = real(1.0_Size4)
+      a = real(1.0,Size4)
+      a = real(1.0_Size8)
+      a = real(1.0,Size8)
+      a = real(1.0_Size16)
+      a = real(1.0,Size16)
+      a = real(1.0_4)
+      a = real(1.0,4)
+      a = real(1.0_8)
+      a = real(1.0,8)
+      a = real(1.0_16)
+      a = real(1.0,16)
+      a = real(f(real(1.2_Size8, Size4),g(h(real(4,Size8)))), Size8)
+      a = real(f(real(1.2_Size8, Size16),g(h(real(4,Size4)))), Size4)
+
+# Test use of Quote and Dynamic macros
+      Dynamic(x,real,1)
+      Dynamic(x,real(Size4),1)
+      Dynamic(x,real(Size8),1)
+      Dynamic(x,real(Size16),1)
+      Dynamic(x,real*4,1)
+      Dynamic(x,real*8,1)
+      Dynamic(x,integer,1)
+      Dynamic(x,integer(Size2),1)
+      Dynamic(x,integer(Size4),1)
+      Dynamic(x,integer(Size8),1)
+      Dynamic(x,integer*4,1)
+      Dynamic(x,integer*8,1)
+      Dynamic(x,complex,1)
+      Dynamic(x,complex(Size4),1)
+      Dynamic(x,complex(Size8),1)
+      Dynamic(x,complex(Size16),1)
+      Dynamic(x,complex*4,1)
+      Dynamic(x,complex*8,1)
+      call bastemp(Point(x),Quote(real),n)
+      call bastemp(Point(x),Quote(real(Size4)),n)
+      call bastemp(Point(x),Quote(real(Size8)),n)
+      call bastemp(Point(x),Quote(real(Size16)),n)
+      call bastemp(Point(x),Quote(real*4),n)
+      call bastemp(Point(x),Quote(real*8),n)
+      call bastemp(Point(x),Quote(integer),n)
+      call bastemp(Point(x),Quote(integer(Size2)),n)
+      call bastemp(Point(x),Quote(integer(Size4)),n)
+      call bastemp(Point(x),Quote(integer(Size8)),n)
+      call bastemp(Point(x),Quote(integer*4),n)
+      call bastemp(Point(x),Quote(integer*8),n)
+      call bastemp(Point(x),Quote(complex),n)
+      call bastemp(Point(x),Quote(complex(Size4)),n)
+      call bastemp(Point(x),Quote(complex(Size8)),n)
+      call bastemp(Point(x),Quote(complex(Size16)),n)
+      call bastemp(Point(x),Quote(complex*4),n)
+      call bastemp(Point(x),Quote(complex*8),n)

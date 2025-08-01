@@ -1,0 +1,15 @@
+cTESTCOMMAND: mppl -w
+c Translations for (mostly) slatec functions
+
+
+
+
+
+c Example usage
+      subroutine foo
+cProlog
+      real x, sdot
+      external scopy, sdot
+      call scopy(N, SX, INCX, SY, INCY)
+      x = sdot (N, SX, INCX, SY, INCY)
+      end

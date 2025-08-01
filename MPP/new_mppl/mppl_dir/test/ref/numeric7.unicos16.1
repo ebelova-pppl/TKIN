@@ -1,0 +1,73 @@
+cTESTCOMMAND: mppl -w
+c Recursive MPPL macro example, contributed by L. LoDestro
+c
+c Repeat(low,high,increment,[[macroname]]),  where macroname
+c will be called with 1 argument = loop index.   [[..]]'s are necessary.
+c If macroname expands to text with commas in it, its def also needs [[..]].
+c (Known bug (expands wrong): if macro macroname has unbalanced right paren.)
+c To repeat without linebreaks, elim 2nd linebreak in define( Repeat0.
+
+
+
+c############################################################################
+c Example usage
+c/CNTROL/eqvartox SET n VARIABLES IN THE eq PACKAGE TO THE VALUES IN x
+c
+      subroutine eqvartox( n, x)
+cProlog
+
+cUse(Vxpointers) (Expansion of Basis groups was omitted for this example.)
+cUse(PFCoils)
+
+
+      real x(*)
+
+      inonc = 0
+      do 23000 in=1, n
+         inonc = inonc+1
+         if ( inonc.eq. 1 ) then
+            vxi1 = x(in)
+            go to 200
+         endif
+         if ( inonc.eq. 2 ) then
+            vxi2 = x(in)
+            go to 200
+         endif
+         if ( inonc.eq. 3 ) then
+            vxi3 = x(in)
+            go to 200
+         endif
+         if ( inonc.eq. 4 ) then
+            vxi4 = x(in)
+            go to 200
+         endif
+         if ( inonc.eq. 5 ) then
+            vxi5 = x(in)
+            go to 200
+         endif
+         if ( inonc.eq. 6 ) then
+            vxi6 = x(in)
+            go to 200
+         endif
+         if ( inonc.eq. 7 ) then
+            vxi7 = x(in)
+            go to 200
+         endif
+         if ( inonc.eq. 8 ) then
+            vxi8 = x(in)
+            go to 200
+         endif
+         if ( inonc.eq. 9 ) then
+            vxi9 = x(in)
+            go to 200
+         endif
+         if ( inonc.eq. 10 ) then
+            vxi10 = x(in)
+            go to 200
+         endif
+
+  200    continue
+23000 continue
+
+      return
+      end

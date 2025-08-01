@@ -1,0 +1,47 @@
+A quick description of files in this directory:
+
+MPPL.DEF        main header file for MPPL
+MPPL.SOR        main source file for MPPL
+
+The rest are the system-dependent modules, which function as controller:
+
+MPPL.CTS        CTSS
+MPPL.LTS        LTSS
+MPPL.NLT        NLTSS
+MPPL.UNX        UNIX
+MPPL.UNC        UNICOS
+MPPL.VAX        VMS
+
+To put MPPL on one of these systems, just run the appropriate controller
+through MPPL on the vax.  For example, if you are putting it on a UNIX
+machine, you could do:
+
+$ mppl mppl.unx >mppl.f
+
+which would produce MPPL.F, now appropriate for compiling on a UNIX
+system.  If you are interested in porting to a new machine, you should
+pick which version is closest to what you need.
+
+
+several FORTRAN versions of the code already prepared:
+
+  mppl.f_u       for SUN workstation
+  mppl.f_rs6     for IBM RS/6000
+  mppl.f_uc      for Cray UNICOS
+
+
+To generate your own mppl you can take the mppl.f_rs6 file, 
+copy it to a file named mppl.f and compile with 
+
+  f77 -o mppl mppl.f
+
+to get the executable mppl.
+
+I also use a script MPPL in my bin directory with the line
+
+  mppl -B $1.p > $1.f
+
+so that I can take a version of a file file.p and convert it to 
+file.f by typing MPPL file.
+
+

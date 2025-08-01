@@ -1,0 +1,159 @@
+cTESTCOMMAND: mppl
+c nested loops
+
+      subroutine foo
+cProlog
+
+c label-less do
+      do 23000 i=1,10
+         print *, "hi"
+
+c while
+         i = 0
+c while(i<10)
+23002    if (i.lt.10) then
+            i = i + 1
+            print *, "hi"
+            go to 23002
+         endif
+c endwhile
+
+c until
+         i = 0
+23004    continue
+            i = i + 1
+            print *, "hi"
+c until(i==10)
+         if ( .not. (i.eq.10) )go to 23004
+
+c for
+c -- for([i=0,i<10,i=i+1])
+         i=0
+         go to 23006
+23007    continue
+            i=i+1
+23006       if (.not.(i.lt.10)) go to 23008
+c -- for([j=0,j<10,j=j+1])
+            j=0
+            go to 23009
+23010       continue
+               j=j+1
+23009          if (.not.(j.lt.10)) go to 23011
+               print *, "hi"
+c -- repeat
+            go to 23010
+23011       continue
+c endfor
+c -- repeat
+         go to 23007
+23008    continue
+c endfor
+
+23000 continue
+
+      do 100 i=1,100
+         do 200 j=1,100
+c next
+            go to   100
+c break
+            go to 23012
+  200       continue
+  100    continue
+23012 continue
+
+23014 continue
+23016    continue
+            go to 23016
+            go to 23017
+            go to 23016
+            go to 23017
+c next
+            go to 23014
+c break
+            go to 23015
+c -- repeat
+         go to 23016
+23017    continue
+         go to 23014
+         go to 23015
+c -- repeat
+      go to 23014
+23015 continue
+
+      do 23018 i=1,100
+         do 23020 j=1,100
+c next
+            go to 23018
+c break
+            go to 23019
+23020    continue
+23018 continue
+23019 continue
+
+      do 23023 i=1,100
+         do 23026 j=1,100
+c next
+            go to 23023
+c break
+            go to 23024
+23026    continue
+23023 continue
+23024 continue
+
+c -- for([i=0,i<imax,i=i+1])
+      i=0
+      go to 23028
+23029 continue
+         i=i+1
+23028    if (.not.(i.lt.imax)) go to 23030
+         go to 23029
+         go to 23030
+c -- for([j=0,j<jmax,j=j+1])
+         j=0
+         go to 23031
+23032    continue
+            j=j+1
+23031       if (.not.(j.lt.jmax)) go to 23033
+c next
+            go to 23029
+c break
+            go to 23030
+c -- repeat
+         go to 23032
+23033    continue
+c endfor
+c -- repeat
+      go to 23029
+23030 continue
+c endfor
+
+c while(i<imax)
+23034 if (i.lt.imax) then
+c while(j<jmax)
+23036    if (j.lt.jmax) then
+c next
+            go to 23034
+c break
+            go to 23035
+            go to 23036
+         endif
+c endwhile
+         go to 23034
+      endif
+c endwhile
+23035 continue
+
+23038 continue
+23040    continue
+c next
+            go to 23038
+c break
+            go to 23039
+c until(j==10)
+         if ( .not. (j.eq.10) )go to 23040
+c until(i==10)
+      if ( .not. (i.eq.10) )go to 23038
+23039 continue
+
+
+      end

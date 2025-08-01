@@ -1,0 +1,19 @@
+cTESTCOMMAND: mppl -I.. -I../tst2 -w
+c Test handling of include statement.
+c This is file input6	1
+      a = 2.0d0
+c%%%%%-included-file:../tst2/file6b 
+c This is file file6b	1
+c%%%%%-included-file:../tst2/file6d 
+c This is file file6d	1
+      d = 2.0d0
+      d = 3.0d0
+      d = 4.0d0
+      b = 3.0d0
+      a = 4.0d0
+c%%%%%-included-file:../tst2/file6c 
+c This is file file6c	1
+      c = 2.0d0
+      c = 3.0d0
+      c = 4.0d0
+      a = 6.0d0

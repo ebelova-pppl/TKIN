@@ -1,0 +1,53 @@
+!TESTCOMMAND: mppl
+! Test case statement
+
+
+      subroutine foo                   ! comment 0
+                                       !Prolog
+
+! comment 1
+! comment 2
+! comment 3
+! comment 4
+! comment 5
+
+      x = 1.0                          ! comment 1a
+      x = 2                            ! comment 1b
+      y = "string here"
+      y = 'here'
+
+      select case (token(2))           ! comment A
+      case (1)
+         call sedo                     ! comment B
+      case (2)
+         call sewhile
+      case (3)                         ! comment C
+         call sendif
+      case (4,7:10)
+         call other
+      case (100)
+         call other100
+      case default
+         call warn('end followed by improper keyword')
+      end select                       ! comment D
+
+      select case (a(2))
+      case (1)
+         call x
+      end select
+
+! comment D
+      select case (a + 1)
+      case (1)
+         call x
+      case default
+         call warn
+      end select                       ! comment E
+
+      end subroutine                   ! comment 6
+
+
+! This is not converted because mppl currently will not process it.
+!      subroutine bar
+!        b = 1
+!      end subroutine bar

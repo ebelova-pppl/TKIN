@@ -1,0 +1,189 @@
+cTESTCOMMAND: mppl -w
+c Everything in here is supposed to be ok.  (May produce warnings)
+
+c Test "implicit real" statements
+      implicit real (a)
+      implicit real (a)
+      implicit doubleprecision (a)
+      implicit real (a)
+      implicit real (a)
+      implicit doubleprecision (a)
+      implicit real*4 (a)
+      implicit real*8 (a)
+
+c Test "implicit integer" statements
+      implicit integer (a)
+      implicit integer (a)
+      implicit integer (a)
+      implicit integer (a)
+      implicit integer (a)
+      implicit integer (a)
+      implicit integer*4 (a)
+      implicit integer*8 (a)
+
+c Test "implicit complex" statements
+      implicit complex (a)
+      implicit complex (a)
+      implicit complex (a)
+      implicit complex (a)
+      implicit complex (a)
+      implicit complex (a)
+      implicit complex*4 (a)
+      implicit complex*8 (a)
+
+c Test real declarations
+      real a
+      real a
+      doubleprecision a
+      real a
+      real a
+      doubleprecision a
+      real a
+      real*4 a
+      real*8 a
+
+c Test integer declarations
+      integer a
+      integer a
+      integer a
+      integer a
+      integer a
+      integer a
+      integer a
+      integer*4 a
+      integer*8 a
+
+c Test complex declarations
+      complex a
+      complex a
+      complex a
+      complex a
+      complex a
+      complex a
+      complex a
+      complex*4 a
+      complex*8 a
+
+c Test real literal constants
+      a = 1.2
+      b = -1.2e-4
+      b = -1.2e-41
+      b = -1.2d-423
+      b = -1.2e-4
+      b = -1.2e-41
+      b = -1.2d-423
+      c = +1.2d0
+      e = 1.234343434e-23
+      if (1.0.and.0.1) then
+      endif
+      if (1.0 .and. 0.1) then
+      endif
+      g = 1. + -2.
+      h = -1. + -.1
+
+c Test integer literal constants
+      a = 123
+      a = 123
+      a = 123
+      a = 123
+      a = 123
+      a = 123
+      a = 123
+      b = -123
+      c = +123 + 233 + -3343
+      if (1 .and. 2) then
+      endif
+      if (1.and.2) then
+      endif
+      if (1.and.2) then
+      endif
+
+c Test real as an intrinsic function
+      a = real(1.0)
+      a = real(1.0)
+      a = real(1.0)
+      a = real(1.0)
+      a = real(1.0d0)
+      a = dble(1.0)
+      a = real(1.0)
+      a = real(1.0)
+      a = real(1.0)
+      a = real(1.0)
+      a = real(1.0d0)
+      a = dble(1.0)
+      a = real(f(real(1.2),g(h(real(4)))))
+      a = real(f(dble(1.2),g(h(real(4)))))
+
+c Test use of Quote and Dynamic macros
+
+      real x (1)
+      pointer(px,x)
+
+      real x (1)
+      pointer(px,x)
+
+      real x (1)
+      pointer(px,x)
+
+      doubleprecision x (1)
+      pointer(px,x)
+
+      real*4 x (1)
+      pointer(px,x)
+
+      real*8 x (1)
+      pointer(px,x)
+
+      integer x (1)
+      pointer(px,x)
+
+      integer x (1)
+      pointer(px,x)
+
+      integer x (1)
+      pointer(px,x)
+
+      integer x (1)
+      pointer(px,x)
+
+      integer*4 x (1)
+      pointer(px,x)
+
+      integer*8 x (1)
+      pointer(px,x)
+
+      complex x (1)
+      pointer(px,x)
+
+      complex x (1)
+      pointer(px,x)
+
+      complex x (1)
+      pointer(px,x)
+
+      complex x (1)
+      pointer(px,x)
+
+      complex*4 x (1)
+      pointer(px,x)
+
+      complex*8 x (1)
+      pointer(px,x)
+      call bastemp(px,'real',n)
+      call bastemp(px,'real',n)
+      call bastemp(px,'real',n)
+      call bastemp(px,'doubleprecision',n)
+      call bastemp(px,'real*4',n)
+      call bastemp(px,'real*8',n)
+      call bastemp(px,'integer',n)
+      call bastemp(px,'integer',n)
+      call bastemp(px,'integer',n)
+      call bastemp(px,'integer',n)
+      call bastemp(px,'integer*4',n)
+      call bastemp(px,'integer*8',n)
+      call bastemp(px,'complex',n)
+      call bastemp(px,'complex',n)
+      call bastemp(px,'complex',n)
+      call bastemp(px,'complex',n)
+      call bastemp(px,'complex*4',n)
+      call bastemp(px,'complex*8',n)

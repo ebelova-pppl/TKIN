@@ -1,0 +1,71 @@
+!TESTCOMMAND: mppl
+! Test loops -- labeled, block, while, until, for
+
+      subroutine foo
+                                       !Prolog
+
+      do 100 i=1,10                    ! comment 1
+         print *, "hi"
+  100    continue                      ! comment 2
+
+! label-less do
+      do i=1,10                        ! comment 3
+         print *, "hi"
+      enddo                            ! comment 4
+
+      do i=1,10                        ! comment 3b
+         print *, "hi"
+      enddo                            ! comment 4b
+
+! while
+      i = 0
+      do while (i.lt.10)               ! comment 5
+         i = i + 1
+         print *, "hi"
+      enddo                            ! comment 6
+
+      do while (i.lt.10)               ! comment 5b
+         i = i + 1
+         print *, "hi"
+      enddo                            ! comment 6b
+
+! until
+      i = 0
+      do                               ! comment 7
+         i = i + 1
+         print *, "hi"
+         if (i.eq.10)exit              ! comment 8
+      enddo
+
+! for
+      i=0
+      do while (i.lt.10)               ! comment 9
+         print *, "hi"
+         i=i+1
+      enddo                            ! comment 10
+
+      i=0
+      do while (i.lt.10)               ! comment 9b
+         print *, "hi"
+         i=i+1
+      enddo                            ! comment 10b
+! endfor
+
+      do while (i.lt.10)               ! null initial condition
+         print *, "hi"
+         i=i+1
+      enddo
+! endfor
+
+! next and break
+      i = 0
+      do                               ! comment 11
+         if (i .eq. 1) cycle           ! comment 12
+         print *, "hi"
+         i = i + 1
+         if (i .eq. 10) exit           ! comment 13
+         cycle                         ! comment 14
+         exit                          ! comment 15
+      enddo                            ! comment 16
+
+      end subroutine

@@ -1,0 +1,38 @@
+#TESTCOMMAND: mppl
+
+      subroutine xxx
+
+      if (dog)  # comment  1a
+      then
+         dog = 1
+      endif
+
+
+      if (dog)  # comment 2a
+          return
+
+      if (dog)  return # comment 3a
+
+      do 
+         if (dog)  # comment 4a
+           break   # comment 4b
+
+         if (dog)  # comment 5a
+           next    # comment 5b
+      enddo
+
+      return       # comment 6
+      end
+
+      function yyy
+
+      if (dog)  # comment 7
+          return (7)
+
+      if (dog)  return (8) # comment 8
+
+      if(t == DIGIT) then  #Old style, user supplied label for the end
+         dog = 1
+      endif
+
+      end 
